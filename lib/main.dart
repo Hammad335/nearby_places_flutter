@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'features/splash_screen/index.dart';
+import 'package:nearby_places_flutter/features/home_screen/binding/home_binding.dart';
+import 'features/home_screen/view/home_screen.dart';
+import 'features/splash_screen/view/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,6 +25,11 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/splash',
           page: () => const SplashScreen(),
+        ),
+        GetPage(
+          name: '/home',
+          page: () => HomeScreen(),
+          binding: HomeBinding(),
         ),
       ],
     );

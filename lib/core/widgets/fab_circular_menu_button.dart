@@ -21,11 +21,7 @@ class FabCircularMenuButton extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.search),
           onPressed: () {
-            controller.searchToggle.value = true;
-            controller.radiusSlider.value = true;
-            controller.cardTapped.value = true;
-            controller.pressedNear.value = true;
-            controller.getDirections.value = true;
+            controller.toggleSearch();
           },
         ),
         IconButton(

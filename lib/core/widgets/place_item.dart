@@ -20,7 +20,9 @@ class PlaceItem extends StatelessWidget {
         onTapDown: (_) {
           FocusManager.instance.primaryFocus?.unfocus();
         },
-        onTap: () {},
+        onTap: () {
+          controller.getPlaceById(place.placeId!);
+        },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [

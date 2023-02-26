@@ -9,6 +9,16 @@ class PlaceAutocompleteRepo {
     _httpService = HttpService();
   }
 
+  Future<Map<String, dynamic>> getPlace(String placeId) async {
+    try {
+      var response = await _httpService.getPlace(placeId);
+      var json = convert.jsonDecode(response.body);
+      return json['result'] as Map<String, dynamic>;
+    } catch (exception) {
+      rethrow;
+    }
+  }
+
   Future<List<Place>> searchPlaces(String query) async {
     try {
       var response = await _httpService.searchPlaces(query);
@@ -16,7 +26,6 @@ class PlaceAutocompleteRepo {
       var placesListJson = json['predictions'] as List;
       return placesListJson.map((place) => Place.fromJson(place)).toList();
     } catch (exception) {
-      print(exception.toString());
       rethrow;
     }
   }

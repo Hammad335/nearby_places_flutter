@@ -21,6 +21,7 @@ class HomeController extends GetxController {
   late Timer? _timer;
   RxBool isLoading = false.obs;
   RxBool showResult = false.obs;
+  late int markerIdCounter;
 
   HomeController() {
     _placeAutocompleteRepo = Get.find<PlaceAutocompleteRepo>();
@@ -29,6 +30,7 @@ class HomeController extends GetxController {
     markers = <Marker>{}.obs;
     places = RxList<Place>();
     _timer = null;
+    markerIdCounter = 1;
   }
 
   init(BuildContext context) {
@@ -52,6 +54,44 @@ class HomeController extends GetxController {
         }
       },
     );
+  }
+
+  void _setMarker({required LatLng latLng}) {
+    Marker marker = Marker(
+      markerId: MarkerId('marker_$markerIdCounter++'),
+      position: latLng,
+      icon: BitmapDescriptor.defaultMarker,
+    );
+    markers.add(marker);
+  }
+
+  Future<void> _gotoSearchPlace({
+    required double lat,
+    required double lng,
+  }) async {
+    _setMarker(latLng: LatLng(lat, lng));
+    final GoogleMapController controller = await mapController.value.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+      target: LatLng(
+        lat,
+        lng,
+      ),
+      zoom: 12,
+    )));
+  }
+
+  Future<void> getPlaceById(String placeId) async {
+    showResult.value = false;
+    try {
+      var place = await _placeAutocompleteRepo.getPlace(placeId);
+      final placeLatLng = place['geometry']['location'];
+      _gotoSearchPlace(
+        lat: placeLatLng['lat'],
+        lng: placeLatLng['lng'],
+      );
+    } catch (exception) {
+      print(exception.toString());
+    }
   }
 
   Future<void> getSearchPlaces(String query) async {

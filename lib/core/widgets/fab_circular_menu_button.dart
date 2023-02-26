@@ -4,12 +4,14 @@ import 'package:nearby_places_flutter/features/home_screen/controller/home_contr
 
 class FabCircularMenuButton extends StatelessWidget {
   final HomeController controller;
+  final GlobalKey<FabCircularMenuState> fabKey = GlobalKey();
 
-  const FabCircularMenuButton({super.key, required this.controller});
+  FabCircularMenuButton({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
     return FabCircularMenu(
+      key: fabKey,
       alignment: Alignment.bottomLeft,
       fabColor: Colors.blue.shade50,
       fabOpenColor: Colors.red.shade100,
@@ -22,6 +24,9 @@ class FabCircularMenuButton extends StatelessWidget {
           icon: const Icon(Icons.search),
           onPressed: () {
             controller.toggleSearch();
+            if (fabKey.currentState?.isOpen ?? true) {
+              fabKey.currentState?.close();
+            }
           },
         ),
         IconButton(

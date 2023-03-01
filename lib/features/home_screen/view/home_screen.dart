@@ -27,16 +27,18 @@ class HomeScreen extends StatelessWidget {
                   SizedBox(
                     width: _controller.size.width,
                     height: _controller.size.height - 28,
-                    child: Obx(
-                      () => GoogleMap(
-                        mapType: MapType.normal,
-                        markers: _controller.markers.value,
-                        initialCameraPosition: Constants.initialCameraPosition,
-                        onMapCreated: (GoogleMapController controller) {
-                          _controller.mapController.value.complete(controller);
-                        },
-                      ),
-                    ),
+                    child: Obx(() {
+                      return GoogleMap(
+                          mapType: MapType.normal,
+                          markers: Set<Marker>.of(_controller.markers),
+                          polylines: _controller.polylines,
+                          initialCameraPosition:
+                              Constants.initialCameraPosition,
+                          onMapCreated: (GoogleMapController controller) {
+                            _controller.mapController.value
+                                .complete(controller);
+                          });
+                    }),
                   ),
                   Obx(
                     () => _controller.searchToggle.value

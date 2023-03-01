@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nearby_places_flutter/core/widgets/loading_indicator.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/home_controller.dart';
 
 class SearchTextWidget extends StatelessWidget {
@@ -40,42 +41,16 @@ class SearchTextWidget extends StatelessWidget {
                 ),
                 border: InputBorder.none,
                 hintText: hintText,
-                suffixIcon: Obx(
-                  () => controller.isLoading.value
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: Center(
-                            child: SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 3),
-                            ),
-                          ),
-                        )
-                      : SizedBox(
-                          width: controller.size.width * 0.26,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              !searchSinglePlace && (null != destTextController)
-                                  ? IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.search),
-                                    )
-                                  : const SizedBox.shrink(),
-                              IconButton(
-                                onPressed: () {
-                                  searchSinglePlace
-                                      ? controller.toggleSearch()
-                                      : controller.toggleGetDirections();
-                                },
-                                icon: const Icon(Icons.close),
-                              ),
-                            ],
-                          ),
-                        ),
-                ),
+                suffixIcon: Obx(() {
+                  controller.isLoading.value;
+                  return searchSinglePlace
+                      ? controller.isLoading.value
+                          ? const LoadingIndication()
+                          : _iconButtonClose
+                      : !(null == destTextController)
+                          ? _iconButtonsSearchAndClose
+                          : const SizedBox.shrink();
+                }),
               ),
               onChanged: (text) {
                 controller.onTextChanged(text, searchSinglePlace);
@@ -84,6 +59,36 @@ class SearchTextWidget extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+
+  Widget get _iconButtonsSearchAndClose {
+    return controller.isLoading.value
+        ? const LoadingIndication()
+        : SizedBox(
+            width: controller.size.width * 0.26,
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    controller.getDirection();
+                  },
+                  icon: const Icon(Icons.search),
+                ),
+                _iconButtonClose,
+              ],
+            ),
+          );
+  }
+
+  Widget get _iconButtonClose {
+    return IconButton(
+      onPressed: () {
+        searchSinglePlace
+            ? controller.toggleSearch()
+            : controller.toggleGetDirections();
+      },
+      icon: const Icon(Icons.close),
     );
   }
 }

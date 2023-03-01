@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
 import 'package:nearby_places_flutter/core/repository/place_autocomplete_repo.dart';
@@ -17,12 +18,14 @@ class HomeController extends GetxController {
   late Rx<TextEditingController> searchTextController;
   late Rx<TextEditingController> destTextController;
   late RxSet<Marker> markers;
+  late RxSet<Polyline> polylines;
   late PlaceAutocompleteRepo _placeAutocompleteRepo;
   late RxList<Place> places;
   late Timer? _timer;
   RxBool isLoading = false.obs;
   RxBool showResult = false.obs;
   late int markerIdCounter;
+  late int polylineIdCounter;
 
   HomeController() {
     _placeAutocompleteRepo = Get.find<PlaceAutocompleteRepo>();
@@ -30,9 +33,11 @@ class HomeController extends GetxController {
     searchTextController = TextEditingController().obs;
     destTextController = TextEditingController().obs;
     markers = <Marker>{}.obs;
+    polylines = <Polyline>{}.obs;
     places = RxList<Place>();
     _timer = null;
     markerIdCounter = 1;
+    polylineIdCounter = 1;
   }
 
   init(BuildContext context) {
@@ -40,13 +45,49 @@ class HomeController extends GetxController {
     size = MediaQuery.of(context).size;
   }
 
-  void onTextChanged(String text, bool searchSinglePlace) {
-    searchSinglePlace
-        ? getSingleSearchPlaces(text)
-        : getOriginToDestPlaces(text);
+  void getDirection() async {
+    try {
+      isLoading.value = true;
+      var directions = await _placeAutocompleteRepo.getDirection(
+        searchTextController.value.text,
+        destTextController.value.text,
+      );
+      isLoading.value = false;
+      _setPolyline(directions['polyline_decoded']);
+      _gotoSearchPlace(
+        lat: directions['start_location']['lat'],
+        lng: directions['start_location']['lng'],
+        destLat: directions['end_location']['lat'],
+        destLng: directions['end_location']['lng'],
+        boundsNe: directions['bounds_ne'],
+        boundsSw: directions['bounds_sw'],
+      );
+    } catch (exception) {
+      print(exception.toString());
+    }
   }
 
-  getSingleSearchPlaces(String text) {
+  void _setPolyline(List<PointLatLng> latLngPoints) {
+    polylines = <Polyline>{}.obs;
+    final String polyLineId = 'polyline_$polylineIdCounter';
+    polylineIdCounter++;
+    polylines.add(
+      Polyline(
+        polylineId: PolylineId(polyLineId),
+        width: 3,
+        color: Colors.red,
+        points: latLngPoints
+            .map((point) => LatLng(point.latitude, point.longitude))
+            .toList(),
+      ),
+    );
+  }
+
+  void onTextChanged(String text, bool searchSinglePlace) {
+    searchSinglePlace ? _getSingleSearchPlaces(text) : null;
+  }
+
+  _getSingleSearchPlaces(String text) {
     if (null != _timer && (_timer?.isActive ?? false)) {
       _timer?.cancel();
     }
@@ -56,7 +97,7 @@ class HomeController extends GetxController {
         if (text.length > 2) {
           isLoading.value = true;
           markers = <Marker>{}.obs;
-          await getSearchPlaces(text);
+          await _getSearchPlaces(text);
           isLoading.value = false;
           showResult.value = true;
         }
@@ -64,30 +105,50 @@ class HomeController extends GetxController {
     );
   }
 
-  getOriginToDestPlaces(String text) {}
-
   void _setMarker({required LatLng latLng}) {
     Marker marker = Marker(
-      markerId: MarkerId('marker_$markerIdCounter++'),
+      markerId: MarkerId('marker_$markerIdCounter'),
       position: latLng,
       icon: BitmapDescriptor.defaultMarker,
     );
+    markerIdCounter++;
     markers.add(marker);
+    update();
   }
 
   Future<void> _gotoSearchPlace({
     required double lat,
     required double lng,
+    double? destLat,
+    double? destLng,
+    Map<String, dynamic>? boundsNe,
+    Map<String, dynamic>? boundsSw,
   }) async {
-    _setMarker(latLng: LatLng(lat, lng));
     final GoogleMapController controller = await mapController.value.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-      target: LatLng(
-        lat,
-        lng,
-      ),
-      zoom: 12,
-    )));
+    markers = <Marker>{}.obs;
+    if (null == boundsNe &&
+        null == boundsSw &&
+        null == destLat &&
+        null == destLng) {
+      controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+        target: LatLng(
+          lat,
+          lng,
+        ),
+        zoom: 18,
+      )));
+      _setMarker(latLng: LatLng(lat, lng));
+    } else {
+      _setMarker(latLng: LatLng(destLat!, destLng!));
+      controller.animateCamera(
+        CameraUpdate.newLatLngBounds(
+            LatLngBounds(
+              southwest: LatLng(boundsSw!['lat'], boundsSw!['lng']),
+              northeast: LatLng(boundsNe!['lat'], boundsNe['lng']),
+            ),
+            32),
+      );
+    }
   }
 
   Future<void> getPlaceById(String placeId) async {
@@ -104,7 +165,7 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> getSearchPlaces(String query) async {
+  Future<void> _getSearchPlaces(String query) async {
     try {
       final result = await _placeAutocompleteRepo.searchPlaces(query);
       places.value = result;
@@ -121,6 +182,7 @@ class HomeController extends GetxController {
     cardTapped.value = false;
     pressedNear.value = false;
     getDirections.value = false;
+    // markers = <Marker>{}.obs;
   }
 
   void toggleGetDirections() {
@@ -132,5 +194,7 @@ class HomeController extends GetxController {
     cardTapped.value = false;
     pressedNear.value = false;
     searchToggle.value = false;
+    markers = <Marker>{}.obs;
+    polylines = <Polyline>{}.obs;
   }
 }

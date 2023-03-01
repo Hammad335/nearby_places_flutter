@@ -1,3 +1,4 @@
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:nearby_places_flutter/core/models/models.dart';
 import 'package:nearby_places_flutter/services/http_service.dart';
 import 'dart:convert' as convert;
@@ -7,6 +8,26 @@ class PlaceAutocompleteRepo {
 
   PlaceAutocompleteRepo() {
     _httpService = HttpService();
+  }
+
+  Future<Map<String, dynamic>> getDirection(
+      String origin, String destination) async {
+    try {
+      var response = await _httpService.getDirections(origin, destination);
+      var json = convert.jsonDecode(response.body);
+      final polyline = json['routes'][0]['overview_polyline']['points'];
+      final decodedPolyline = PolylinePoints().decodePolyline(polyline);
+      return {
+        'bounds_ne': json['routes'][0]['bounds']['northeast'],
+        'bounds_sw': json['routes'][0]['bounds']['southwest'],
+        'start_location': json['routes'][0]['legs'][0]['start_location'],
+        'end_location': json['routes'][0]['legs'][0]['end_location'],
+        'poly_line': polyline,
+        'polyline_decoded': decodedPolyline,
+      };
+    } catch (exception) {
+      rethrow;
+    }
   }
 
   Future<Map<String, dynamic>> getPlace(String placeId) async {

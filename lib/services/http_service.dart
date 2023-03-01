@@ -1,4 +1,3 @@
-import 'package:nearby_places_flutter/constants/constants.dart';
 import 'package:http/http.dart' as http;
 
 // todo place your api key here

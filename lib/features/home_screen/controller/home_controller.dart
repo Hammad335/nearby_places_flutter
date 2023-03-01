@@ -14,7 +14,8 @@ class HomeController extends GetxController {
   RxBool cardTapped = false.obs;
   RxBool pressedNear = false.obs;
   RxBool getDirections = false.obs;
-  late Rx<TextEditingController> textController;
+  late Rx<TextEditingController> searchTextController;
+  late Rx<TextEditingController> destTextController;
   late RxSet<Marker> markers;
   late PlaceAutocompleteRepo _placeAutocompleteRepo;
   late RxList<Place> places;
@@ -26,7 +27,8 @@ class HomeController extends GetxController {
   HomeController() {
     _placeAutocompleteRepo = Get.find<PlaceAutocompleteRepo>();
     mapController = Completer<GoogleMapController>().obs;
-    textController = TextEditingController().obs;
+    searchTextController = TextEditingController().obs;
+    destTextController = TextEditingController().obs;
     markers = <Marker>{}.obs;
     places = RxList<Place>();
     _timer = null;
@@ -38,7 +40,13 @@ class HomeController extends GetxController {
     size = MediaQuery.of(context).size;
   }
 
-  void onTextChanged(String text) {
+  void onTextChanged(String text, bool searchSinglePlace) {
+    searchSinglePlace
+        ? getSingleSearchPlaces(text)
+        : getOriginToDestPlaces(text);
+  }
+
+  getSingleSearchPlaces(String text) {
     if (null != _timer && (_timer?.isActive ?? false)) {
       _timer?.cancel();
     }
@@ -55,6 +63,8 @@ class HomeController extends GetxController {
       },
     );
   }
+
+  getOriginToDestPlaces(String text) {}
 
   void _setMarker({required LatLng latLng}) {
     Marker marker = Marker(
@@ -105,11 +115,22 @@ class HomeController extends GetxController {
 
   void toggleSearch() {
     searchToggle.value = !searchToggle.value;
-    textController.value.text = '';
+    searchTextController.value.text = '';
     showResult.value = false;
     radiusSlider.value = false;
     cardTapped.value = false;
     pressedNear.value = false;
     getDirections.value = false;
+  }
+
+  void toggleGetDirections() {
+    getDirections.value = !getDirections.value;
+    searchTextController.value.text = '';
+    destTextController.value.text = '';
+    showResult.value = false;
+    radiusSlider.value = false;
+    cardTapped.value = false;
+    pressedNear.value = false;
+    searchToggle.value = false;
   }
 }

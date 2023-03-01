@@ -4,3 +4,4 @@ export 'place_item.dart';
 export 'results_not_found_widget.dart';
 export 'custom_container.dart';
 export 'places_list.dart';
+export 'origin_to_dest_text_widget.dart';

@@ -6,9 +6,9 @@ import 'package:nearby_places_flutter/features/home_screen/controller/home_contr
 import '../../../core/widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({Key? key}) : super(key: key);
-
   final _controller = Get.find<HomeController>();
+
+  HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,11 @@ class HomeScreen extends StatelessWidget {
                   ),
                   Obx(
                     () => _controller.searchToggle.value
-                        ? SearchTextWidget(controller: _controller)
+                        ? SearchTextWidget(
+                            controller: _controller,
+                            hintText: 'Search place here',
+                            searchSinglePlace: true,
+                          )
                         : const SizedBox.shrink(),
                   ),
                   Obx(
@@ -50,6 +54,11 @@ class HomeScreen extends StatelessWidget {
                                 ? PlacesList(controller: _controller)
                                 : ResultsNotFoundWidget(controller: _controller)
                             : const SizedBox.shrink()
+                        : const SizedBox.shrink(),
+                  ),
+                  Obx(
+                    () => _controller.getDirections.value
+                        ? OriginToDestTextWidget(controller: _controller)
                         : const SizedBox.shrink(),
                   ),
                 ],

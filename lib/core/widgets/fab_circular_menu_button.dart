@@ -24,16 +24,23 @@ class FabCircularMenuButton extends StatelessWidget {
           icon: const Icon(Icons.search),
           onPressed: () {
             controller.toggleSearch();
-            if (fabKey.currentState?.isOpen ?? true) {
-              fabKey.currentState?.close();
-            }
+            _closeFabMenu();
           },
         ),
         IconButton(
           icon: const Icon(Icons.navigation),
-          onPressed: () {},
+          onPressed: () {
+            controller.toggleGetDirections();
+            _closeFabMenu();
+          },
         ),
       ],
     );
+  }
+
+  _closeFabMenu() {
+    if (fabKey.currentState?.isOpen ?? true) {
+      fabKey.currentState?.close();
+    }
   }
 }

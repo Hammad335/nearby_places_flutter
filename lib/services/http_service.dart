@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 
 // todo place your api key here
-const API_KEY = 'AIzaSyCukbDp8yOAB4CbH2WpchQ1IDpwBQQlzpw';
+const API_KEY = 'api-key-here';
 const TYPE = 'geocode';
 
 class HttpService {

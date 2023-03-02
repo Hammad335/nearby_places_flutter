@@ -20,7 +20,8 @@ class OriginToDestTextWidget extends StatelessWidget {
           controller: controller,
           hintText: 'Destination',
           searchSinglePlace: false,
-          destTextController: controller.destTextController.value,
+          destTextController:
+              controller.searchController.destTextController.value,
           paddingTop: 10,
         ),
       ],

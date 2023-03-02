@@ -26,22 +26,24 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: _controller.size.width,
-                    height: _controller.size.height - 28,
-                    child: Obx(() {
-                      return GoogleMap(
-                          mapType: MapType.normal,
-                          markers: Set<Marker>.of(_controller.markers),
-                          polylines: _controller.polylines,
-                          initialCameraPosition:
-                              Constants.initialCameraPosition,
-                          onMapCreated: (GoogleMapController controller) {
-                            _controller.mapController.value
-                                .complete(controller);
-                          });
-                    }),
+                    height: _controller.size.height - 24,
+                    child: GetBuilder<HomeController>(
+                        init: _controller,
+                        builder: (controller) {
+                          return GoogleMap(
+                              mapType: MapType.normal,
+                              markers: _controller.markers,
+                              polylines: _controller.polylines,
+                              initialCameraPosition:
+                                  Constants.initialCameraPosition,
+                              onMapCreated: (GoogleMapController controller) {
+                                _controller.mapController.value
+                                    .complete(controller);
+                              });
+                        }),
                   ),
                   Obx(
-                    () => _controller.searchToggle.value
+                    () => _controller.searchController.searchToggle.value
                         ? SearchTextWidget(
                             controller: _controller,
                             hintText: 'Search place here',
@@ -51,7 +53,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   Obx(
                     () => !_controller.isLoading.value
-                        ? _controller.showResult.value
+                        ? _controller.searchController.showResult.value
                             ? _controller.places.isNotEmpty
                                 ? PlacesList(controller: _controller)
                                 : ResultsNotFoundWidget(controller: _controller)
@@ -59,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                         : const SizedBox.shrink(),
                   ),
                   Obx(
-                    () => _controller.getDirections.value
+                    () => _controller.searchController.getDirections.value
                         ? OriginToDestTextWidget(controller: _controller)
                         : const SizedBox.shrink(),
                   ),

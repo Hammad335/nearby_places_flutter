@@ -4,34 +4,28 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
 import 'package:nearby_places_flutter/core/repository/place_autocomplete_repo.dart';
+import 'package:nearby_places_flutter/features/home_screen/controller/search_controller.dart';
 import '../../../core/models/models.dart';
+import '../../../core/utils/utils.dart';
 
 class HomeController extends GetxController {
   late BuildContext context;
   late Size size;
+  late PlaceAutocompleteRepo _placeAutocompleteRepo;
+  late SearchController searchController;
   late Rx<Completer<GoogleMapController>> mapController;
-  RxBool searchToggle = false.obs;
-  RxBool radiusSlider = false.obs;
-  RxBool cardTapped = false.obs;
-  RxBool pressedNear = false.obs;
-  RxBool getDirections = false.obs;
-  late Rx<TextEditingController> searchTextController;
-  late Rx<TextEditingController> destTextController;
   late RxSet<Marker> markers;
   late RxSet<Polyline> polylines;
-  late PlaceAutocompleteRepo _placeAutocompleteRepo;
   late RxList<Place> places;
   late Timer? _timer;
   RxBool isLoading = false.obs;
-  RxBool showResult = false.obs;
   late int markerIdCounter;
   late int polylineIdCounter;
 
   HomeController() {
     _placeAutocompleteRepo = Get.find<PlaceAutocompleteRepo>();
+    searchController = Get.find<SearchController>();
     mapController = Completer<GoogleMapController>().obs;
-    searchTextController = TextEditingController().obs;
-    destTextController = TextEditingController().obs;
     markers = <Marker>{}.obs;
     polylines = <Polyline>{}.obs;
     places = RxList<Place>();
@@ -48,10 +42,12 @@ class HomeController extends GetxController {
   void getDirection() async {
     try {
       isLoading.value = true;
-      var directions = await _placeAutocompleteRepo.getDirection(
-        searchTextController.value.text,
-        destTextController.value.text,
-      );
+      var directions = await _placeAutocompleteRepo
+          .getDirection(
+            searchController.originTextController.value.text,
+            searchController.destTextController.value.text,
+          )
+          .timeout(const Duration(seconds: 5));
       isLoading.value = false;
       _setPolyline(directions['polyline_decoded']);
       _gotoSearchPlace(
@@ -63,7 +59,26 @@ class HomeController extends GetxController {
         boundsSw: directions['bounds_sw'],
       );
     } catch (exception) {
-      print(exception.toString());
+      isLoading.value = false;
+      Utils.showSnackBar(exception.toString());
+    }
+  }
+
+  void onTextChanged(String text, bool searchSinglePlace) {
+    searchSinglePlace ? _getSingleSearchPlaces(text) : null;
+  }
+
+  Future<void> getPlaceById(String placeId) async {
+    searchController.showResult.value = false;
+    try {
+      var place = await _placeAutocompleteRepo.getPlace(placeId);
+      final placeLatLng = place['geometry']['location'];
+      _gotoSearchPlace(
+        lat: placeLatLng['lat'],
+        lng: placeLatLng['lng'],
+      );
+    } catch (exception) {
+      Utils.showSnackBar(exception.toString());
     }
   }
 
@@ -83,10 +98,6 @@ class HomeController extends GetxController {
     );
   }
 
-  void onTextChanged(String text, bool searchSinglePlace) {
-    searchSinglePlace ? _getSingleSearchPlaces(text) : null;
-  }
-
   _getSingleSearchPlaces(String text) {
     if (null != _timer && (_timer?.isActive ?? false)) {
       _timer?.cancel();
@@ -99,7 +110,7 @@ class HomeController extends GetxController {
           markers = <Marker>{}.obs;
           await _getSearchPlaces(text);
           isLoading.value = false;
-          showResult.value = true;
+          searchController.showResult.value = true;
         }
       },
     );
@@ -126,6 +137,7 @@ class HomeController extends GetxController {
   }) async {
     final GoogleMapController controller = await mapController.value.future;
     markers = <Marker>{}.obs;
+    _setMarker(latLng: LatLng(lat, lng));
     if (null == boundsNe &&
         null == boundsSw &&
         null == destLat &&
@@ -137,31 +149,16 @@ class HomeController extends GetxController {
         ),
         zoom: 18,
       )));
-      _setMarker(latLng: LatLng(lat, lng));
     } else {
       _setMarker(latLng: LatLng(destLat!, destLng!));
       controller.animateCamera(
         CameraUpdate.newLatLngBounds(
             LatLngBounds(
-              southwest: LatLng(boundsSw!['lat'], boundsSw!['lng']),
+              southwest: LatLng(boundsSw!['lat'], boundsSw['lng']),
               northeast: LatLng(boundsNe!['lat'], boundsNe['lng']),
             ),
             32),
       );
-    }
-  }
-
-  Future<void> getPlaceById(String placeId) async {
-    showResult.value = false;
-    try {
-      var place = await _placeAutocompleteRepo.getPlace(placeId);
-      final placeLatLng = place['geometry']['location'];
-      _gotoSearchPlace(
-        lat: placeLatLng['lat'],
-        lng: placeLatLng['lng'],
-      );
-    } catch (exception) {
-      print(exception.toString());
     }
   }
 
@@ -170,31 +167,7 @@ class HomeController extends GetxController {
       final result = await _placeAutocompleteRepo.searchPlaces(query);
       places.value = result;
     } catch (exception) {
-      print(exception.toString());
+      Utils.showSnackBar(exception.toString());
     }
-  }
-
-  void toggleSearch() {
-    searchToggle.value = !searchToggle.value;
-    searchTextController.value.text = '';
-    showResult.value = false;
-    radiusSlider.value = false;
-    cardTapped.value = false;
-    pressedNear.value = false;
-    getDirections.value = false;
-    // markers = <Marker>{}.obs;
-  }
-
-  void toggleGetDirections() {
-    getDirections.value = !getDirections.value;
-    searchTextController.value.text = '';
-    destTextController.value.text = '';
-    showResult.value = false;
-    radiusSlider.value = false;
-    cardTapped.value = false;
-    pressedNear.value = false;
-    searchToggle.value = false;
-    markers = <Marker>{}.obs;
-    polylines = <Polyline>{}.obs;
   }
 }

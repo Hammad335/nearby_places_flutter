@@ -31,7 +31,7 @@ class ResultsNotFoundWidget extends StatelessWidget {
                 child: ElevatedButton(
                   child: const Text('Dismiss'),
                   onPressed: () {
-                    controller.showResult.value = false;
+                    controller.searchController.showResult.value = false;
                   },
                 ),
               ),

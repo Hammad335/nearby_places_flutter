@@ -32,8 +32,8 @@ class SearchTextWidget extends StatelessWidget {
               color: Colors.white,
             ),
             child: TextFormField(
-              controller:
-                  destTextController ?? controller.searchTextController.value,
+              controller: destTextController ??
+                  controller.searchController.originTextController.value,
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 20,
@@ -85,8 +85,8 @@ class SearchTextWidget extends StatelessWidget {
     return IconButton(
       onPressed: () {
         searchSinglePlace
-            ? controller.toggleSearch()
-            : controller.toggleGetDirections();
+            ? controller.searchController.toggleSearch()
+            : controller.searchController.toggleGetDirections();
       },
       icon: const Icon(Icons.close),
     );

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -116,11 +117,11 @@ class HomeController extends GetxController {
     );
   }
 
-  void _setMarker({required LatLng latLng}) {
+  void setMarker({required LatLng latLng, BitmapDescriptor? markerIcon}) {
     Marker marker = Marker(
       markerId: MarkerId('marker_$markerIdCounter'),
       position: latLng,
-      icon: BitmapDescriptor.defaultMarker,
+      icon: markerIcon ?? BitmapDescriptor.defaultMarker,
     );
     markerIdCounter++;
     markers.add(marker);
@@ -137,7 +138,7 @@ class HomeController extends GetxController {
   }) async {
     final GoogleMapController controller = await mapController.value.future;
     markers = <Marker>{}.obs;
-    _setMarker(latLng: LatLng(lat, lng));
+    setMarker(latLng: LatLng(lat, lng));
     if (null == boundsNe &&
         null == boundsSw &&
         null == destLat &&
@@ -150,7 +151,7 @@ class HomeController extends GetxController {
         zoom: 18,
       )));
     } else {
-      _setMarker(latLng: LatLng(destLat!, destLng!));
+      setMarker(latLng: LatLng(destLat!, destLng!));
       controller.animateCamera(
         CameraUpdate.newLatLngBounds(
             LatLngBounds(

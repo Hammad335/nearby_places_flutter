@@ -11,15 +11,36 @@ class PlaceAutocompleteRepo {
     _httpService = HttpService();
   }
 
-  // Future<Map<String, dynamic>> getNearbyPlaces(
-  //     LatLng location, int radius) async {
-  //   try {
-  //     var response = await _httpService.getNearbyPlaces(location, radius);
-  //     return convert.jsonDecode(response.body);
-  //   } catch (exception) {
-  //     rethrow;
-  //   }
-  // }
+  Future<Map<String, dynamic>> getNearbyPlaces(
+      LatLng location, int radius) async {
+    try {
+      var response = await _httpService.getNearbyPlaces(location, radius);
+      var json = convert.jsonDecode(response.body);
+      var placesJson = json['results'] as List;
+
+      // token for more nearbyPlaces
+      String token = json['next_page_token'] ?? 'none';
+
+      List<NearbyPlace> nearbyPlaces = <NearbyPlace>[];
+      for (var place in placesJson) {
+        var location = place['geometry']['location'];
+        nearbyPlaces.add(
+          NearbyPlace(
+            position: LatLng(location['lat'], location['lng']),
+            name: place['name'],
+            types: place['types'].cast<String>(),
+            businessStatus: place['business_status'] ?? 'not available',
+          ),
+        );
+      }
+      return {
+        'nearby_places': nearbyPlaces,
+        'token': token,
+      };
+    } catch (exception) {
+      rethrow;
+    }
+  }
 
   Future<Map<String, dynamic>> getDirection(
       String origin, String destination) async {

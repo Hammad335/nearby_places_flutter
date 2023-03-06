@@ -28,7 +28,9 @@ class RadiusSliderWidget extends StatelessWidget {
               ),
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                nearbyPlacesController.getNearbyPlaces();
+              },
               icon: const Icon(
                 Icons.near_me,
                 // color: Colors.blue,

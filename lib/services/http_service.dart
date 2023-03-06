@@ -6,20 +6,20 @@ const API_KEY = 'api-key-here';
 const TYPE = 'geocode';
 
 class HttpService {
-  // Future<http.Response> getNearbyPlaces(LatLng location, int radius) async {
-  //   final lat = location.latitude;
-  //   final lng = location.longitude;
-  //
-  //   final String url =
-  //       'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
-  //       'location=$lat,$lng&radius=$radius&key=$API_KEY';
-  //
-  //   try {
-  //     return await http.get(Uri.parse(url));
-  //   } catch (exception) {
-  //     rethrow;
-  //   }
-  // }
+  Future<http.Response> getNearbyPlaces(LatLng location, int radius) async {
+    final lat = location.latitude;
+    final lng = location.longitude;
+
+    final String url =
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
+        'location=$lat,$lng&radius=$radius&key=$API_KEY';
+
+    try {
+      return await http.get(Uri.parse(url));
+    } catch (exception) {
+      rethrow;
+    }
+  }
 
   Future<http.Response> searchPlaces(String query) async {
     final String url =

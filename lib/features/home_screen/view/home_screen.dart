@@ -31,15 +31,21 @@ class HomeScreen extends StatelessWidget {
                         init: _controller,
                         builder: (controller) {
                           return GoogleMap(
-                              mapType: MapType.normal,
-                              markers: _controller.markers,
-                              polylines: _controller.polylines,
-                              initialCameraPosition:
-                                  Constants.initialCameraPosition,
-                              onMapCreated: (GoogleMapController controller) {
-                                _controller.mapController.value
-                                    .complete(controller);
-                              });
+                            mapType: MapType.normal,
+                            markers: _controller.markers,
+                            polylines: _controller.polylines,
+                            circles: _controller.nearbyPlacesController.circles,
+                            initialCameraPosition:
+                                Constants.initialCameraPosition,
+                            onMapCreated: (GoogleMapController controller) {
+                              _controller.mapController.value
+                                  .complete(controller);
+                            },
+                            onTap: (LatLng point) {
+                              _controller.nearbyPlacesController
+                                  .drawCircle(point);
+                            },
+                          );
                         }),
                   ),
                   Obx(
@@ -63,6 +69,14 @@ class HomeScreen extends StatelessWidget {
                   Obx(
                     () => _controller.searchController.getDirections.value
                         ? OriginToDestTextWidget(controller: _controller)
+                        : const SizedBox.shrink(),
+                  ),
+                  Obx(
+                    () => _controller.nearbyPlacesController.radiusSlider.value
+                        ? RadiusSliderWidget(
+                            nearbyPlacesController:
+                                _controller.nearbyPlacesController,
+                          )
                         : const SizedBox.shrink(),
                   ),
                 ],

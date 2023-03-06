@@ -4,6 +4,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
 import 'package:nearby_places_flutter/core/repository/place_autocomplete_repo.dart';
+import 'package:nearby_places_flutter/features/home_screen/controller/nearby_places_controller.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/search_controller.dart';
 import '../../../core/models/models.dart';
 import '../../../core/utils/utils.dart';
@@ -13,6 +14,7 @@ class HomeController extends GetxController {
   late Size size;
   late PlaceAutocompleteRepo _placeAutocompleteRepo;
   late SearchController searchController;
+  late NearbyPlacesController nearbyPlacesController;
   late Rx<Completer<GoogleMapController>> mapController;
   late RxSet<Marker> markers;
   late RxSet<Polyline> polylines;
@@ -25,6 +27,7 @@ class HomeController extends GetxController {
   HomeController() {
     _placeAutocompleteRepo = Get.find<PlaceAutocompleteRepo>();
     searchController = Get.find<SearchController>();
+    nearbyPlacesController = Get.find<NearbyPlacesController>();
     mapController = Completer<GoogleMapController>().obs;
     markers = <Marker>{}.obs;
     polylines = <Polyline>{}.obs;
@@ -65,7 +68,22 @@ class HomeController extends GetxController {
   }
 
   void onTextChanged(String text, bool searchSinglePlace) {
-    searchSinglePlace ? _getSingleSearchPlaces(text) : null;
+    if (searchSinglePlace) {
+      if (null != _timer && (_timer?.isActive ?? false)) {
+        _timer?.cancel();
+      }
+      _timer = Timer(
+        const Duration(milliseconds: 700),
+        () async {
+          if (text.length > 2) {
+            isLoading.value = true;
+            await _getSearchPlaces(text);
+            isLoading.value = false;
+            searchController.showResult.value = true;
+          }
+        },
+      );
+    }
   }
 
   Future<void> getPlaceById(String placeId) async {
@@ -95,24 +113,6 @@ class HomeController extends GetxController {
             .map((point) => LatLng(point.latitude, point.longitude))
             .toList(),
       ),
-    );
-  }
-
-  _getSingleSearchPlaces(String text) {
-    if (null != _timer && (_timer?.isActive ?? false)) {
-      _timer?.cancel();
-    }
-    _timer = Timer(
-      const Duration(milliseconds: 700),
-      () async {
-        if (text.length > 2) {
-          isLoading.value = true;
-          markers = <Marker>{}.obs;
-          await _getSearchPlaces(text);
-          isLoading.value = false;
-          searchController.showResult.value = true;
-        }
-      },
     );
   }
 

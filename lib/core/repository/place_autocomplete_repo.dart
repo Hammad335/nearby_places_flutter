@@ -1,4 +1,5 @@
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:nearby_places_flutter/core/models/models.dart';
 import 'package:nearby_places_flutter/services/http_service.dart';
 import 'dart:convert' as convert;
@@ -9,6 +10,16 @@ class PlaceAutocompleteRepo {
   PlaceAutocompleteRepo() {
     _httpService = HttpService();
   }
+
+  // Future<Map<String, dynamic>> getNearbyPlaces(
+  //     LatLng location, int radius) async {
+  //   try {
+  //     var response = await _httpService.getNearbyPlaces(location, radius);
+  //     return convert.jsonDecode(response.body);
+  //   } catch (exception) {
+  //     rethrow;
+  //   }
+  // }
 
   Future<Map<String, dynamic>> getDirection(
       String origin, String destination) async {

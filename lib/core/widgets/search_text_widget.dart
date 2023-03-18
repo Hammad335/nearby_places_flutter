@@ -45,7 +45,7 @@ class SearchTextWidget extends StatelessWidget {
                   controller.isLoading.value;
                   return searchSinglePlace
                       ? controller.isLoading.value
-                          ? const LoadingIndication()
+                          ? const LoadingIndicator()
                           : _iconButtonClose
                       : !(null == destTextController)
                           ? _iconButtonsSearchAndClose
@@ -64,7 +64,7 @@ class SearchTextWidget extends StatelessWidget {
 
   Widget get _iconButtonsSearchAndClose {
     return controller.isLoading.value
-        ? const LoadingIndication()
+        ? const LoadingIndicator()
         : SizedBox(
             width: controller.size.width * 0.26,
             child: Row(

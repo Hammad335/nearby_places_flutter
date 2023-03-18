@@ -31,12 +31,7 @@ class SearchController extends GetxController {
     getDirections.value = !getDirections.value;
     originTextController.value.text = '';
     destTextController.value.text = '';
-    showResult.value = false;
-    _nearbyPlacesController.radiusSlider.value = false;
-    cardTapped.value = false;
-    pressedNear.value = false;
-    searchToggle.value = false;
-    _homeController.markers = <Marker>{}.obs;
+    _toggle();
     _homeController.polylines = <Polyline>{}.obs;
     _homeController.update();
   }
@@ -44,12 +39,17 @@ class SearchController extends GetxController {
   void toggleSearch() {
     searchToggle.value = !searchToggle.value;
     originTextController.value.text = '';
+    _toggle();
+    _homeController.update();
+  }
+
+  _toggle() {
     showResult.value = false;
     _nearbyPlacesController.radiusSlider.value = false;
     cardTapped.value = false;
     pressedNear.value = false;
-    getDirections.value = false;
+    searchToggle.value = false;
     _homeController.markers = <Marker>{}.obs;
-    _homeController.update();
+    _nearbyPlacesController.circles.clear();
   }
 }

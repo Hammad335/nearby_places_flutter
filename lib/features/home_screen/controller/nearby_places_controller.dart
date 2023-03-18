@@ -20,6 +20,7 @@ class NearbyPlacesController extends GetxController {
   RxDouble radius = 3000.0.obs;
   late Timer? _timer;
   late RxList<NearbyPlace> nearbyPlaces;
+  RxBool isLoading = false.obs;
   String _tokenKey = '';
 
   NearbyPlacesController() {
@@ -85,6 +86,7 @@ class NearbyPlacesController extends GetxController {
   }
 
   void getNearbyPlaces() {
+    isLoading.value = true;
     if (null != _timer && (_timer?.isActive ?? false)) {
       _timer?.cancel();
     }
@@ -96,10 +98,11 @@ class NearbyPlacesController extends GetxController {
         );
         nearbyPlaces.value = jsonResult['nearby_places'] as List<NearbyPlace>;
         _tokenKey = jsonResult['token'] ?? 'none'; // for more nearbyPlaces
-
+        isLoading.value = false;
         _setNearbyPlacesMarkers();
       });
     } catch (exception) {
+      isLoading.value = false;
       Utils.showSnackBar(exception.toString());
     }
   }

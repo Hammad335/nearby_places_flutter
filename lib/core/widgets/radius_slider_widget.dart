@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nearby_places_flutter/core/widgets/widgets.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/nearby_places_controller.dart';
 
 class RadiusSliderWidget extends StatelessWidget {
@@ -31,9 +32,13 @@ class RadiusSliderWidget extends StatelessWidget {
               onPressed: () {
                 nearbyPlacesController.getNearbyPlaces();
               },
-              icon: const Icon(
-                Icons.near_me,
-                // color: Colors.blue,
+              icon: Obx(
+                () => nearbyPlacesController.isLoading.value
+                    ? const LoadingIndicator()
+                    : const Icon(
+                        Icons.near_me,
+                        // color: Colors.blue,
+                      ),
               ),
             ),
           ],

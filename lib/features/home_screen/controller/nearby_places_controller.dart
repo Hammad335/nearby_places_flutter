@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -14,14 +15,17 @@ class NearbyPlacesController extends GetxController {
   late HomeController _homeController;
   late SearchController _searchController;
   late PlaceAutocompleteRepo _placeAutocompleteRepo;
-  RxBool radiusSlider = false.obs;
+
   late RxSet<Circle> circles;
   late Rx<LatLng> tappedPoint;
+  RxBool radiusSlider = false.obs;
   RxDouble radius = 3000.0.obs;
-  late Timer? _timer;
+
   late RxList<NearbyPlace> nearbyPlaces;
-  RxBool isLoading = false.obs;
   String _tokenKey = '';
+
+  RxBool isLoading = false.obs;
+  late Timer? _timer;
 
   NearbyPlacesController() {
     circles = <Circle>{}.obs;
@@ -64,10 +68,10 @@ class NearbyPlacesController extends GetxController {
       markerIcon = await _getBytesFromAsset('assets/icons/hotels.png', 75);
     } else if (types.contains('store')) {
       markerIcon =
-          await _getBytesFromAsset('assets/icons/retail-stores.png', 75);
+      await _getBytesFromAsset('assets/icons/retail-stores.png', 75);
     } else if (types.contains('locality')) {
       markerIcon =
-          await _getBytesFromAsset('assets/icons/local-services.png', 75);
+      await _getBytesFromAsset('assets/icons/local-services.png', 75);
     } else {
       markerIcon = await _getBytesFromAsset('assets/icons/places.png', 75);
     }
@@ -75,7 +79,7 @@ class NearbyPlacesController extends GetxController {
   }
 
   void _setNearbyPlacesMarkers() async {
-    _homeController.markers = <Marker>{}.obs;
+    // _homeController.markers = <Marker>{}.obs;
     for (var place in nearbyPlaces) {
       final Uint8List markerIcon = await _getMarkerIcon(place.types);
       _homeController.setMarker(
@@ -92,14 +96,27 @@ class NearbyPlacesController extends GetxController {
     }
     try {
       _timer = Timer(const Duration(seconds: 2), () async {
-        var jsonResult = await _placeAutocompleteRepo.getNearbyPlaces(
-          tappedPoint.value,
-          radius.toInt(),
-        );
-        nearbyPlaces.value = jsonResult['nearby_places'] as List<NearbyPlace>;
-        _tokenKey = jsonResult['token'] ?? 'none'; // for more nearbyPlaces
-        isLoading.value = false;
-        _setNearbyPlacesMarkers();
+        if (_searchController.pressedNear.value && 'none' == _tokenKey) {
+          isLoading.value = false;
+        }
+        else {
+          Map<String, dynamic> jsonResult;
+          if (_searchController.pressedNear.value) {
+            jsonResult = await _placeAutocompleteRepo.getNearbyPlaces(
+              tokenKey: _tokenKey,
+            );
+          } else {
+            jsonResult = await _placeAutocompleteRepo.getNearbyPlaces(
+              location: tappedPoint.value,
+              radius: radius.toInt(),
+            );
+          }
+          nearbyPlaces.value = jsonResult['nearby_places'] as List<NearbyPlace>;
+          _tokenKey = jsonResult['token'] ?? 'none'; // for more nearbyPlaces
+          isLoading.value = false;
+          _setNearbyPlacesMarkers();
+          _searchController.pressedNear.value = true;
+        }
       });
     } catch (exception) {
       isLoading.value = false;
@@ -116,7 +133,7 @@ class NearbyPlacesController extends GetxController {
   void drawCircle(LatLng point) async {
     tappedPoint = point.obs;
     final GoogleMapController mapController =
-        await _homeController.mapController.value.future;
+    await _homeController.mapController.value.future;
 
     mapController.animateCamera(
       CameraUpdate.newCameraPosition(
@@ -135,6 +152,7 @@ class NearbyPlacesController extends GetxController {
     );
     _searchController.getDirections.value = false;
     _searchController.searchToggle.value = false;
+    _homeController.markers.clear();
     radiusSlider.value = true;
     // _searchController.update();
     _homeController.update();

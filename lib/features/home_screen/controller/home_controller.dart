@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -13,17 +12,21 @@ import '../../../core/utils/utils.dart';
 class HomeController extends GetxController {
   late BuildContext context;
   late Size size;
+
   late PlaceAutocompleteRepo _placeAutocompleteRepo;
   late SearchController searchController;
   late NearbyPlacesController nearbyPlacesController;
+
   late Rx<Completer<GoogleMapController>> mapController;
   late RxSet<Marker> markers;
   late RxSet<Polyline> polylines;
   late RxList<Place> places;
-  late Timer? _timer;
-  RxBool isLoading = false.obs;
+
   late int markerIdCounter;
   late int polylineIdCounter;
+
+  late Timer? _timer;
+  RxBool isLoading = false.obs;
 
   HomeController() {
     _placeAutocompleteRepo = Get.find<PlaceAutocompleteRepo>();

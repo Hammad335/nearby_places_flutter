@@ -48,7 +48,7 @@ class SearchController extends GetxController {
     _nearbyPlacesController.radiusSlider.value = false;
     cardTapped.value = false;
     pressedNear.value = false;
-    searchToggle.value = false;
+    // searchToggle.value = false;
     _homeController.markers = <Marker>{}.obs;
     _nearbyPlacesController.circles.clear();
   }

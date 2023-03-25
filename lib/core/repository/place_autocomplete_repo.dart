@@ -1,6 +1,8 @@
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:http/src/response.dart';
 import 'package:nearby_places_flutter/core/models/models.dart';
+import 'package:nearby_places_flutter/core/utils/utils.dart';
 import 'package:nearby_places_flutter/services/http_service.dart';
 import 'dart:convert' as convert;
 
@@ -11,10 +13,18 @@ class PlaceAutocompleteRepo {
     _httpService = HttpService();
   }
 
-  Future<Map<String, dynamic>> getNearbyPlaces(
-      LatLng location, int radius) async {
+  Future<Map<String, dynamic>> getNearbyPlaces({
+    LatLng? location,
+    int? radius,
+    String? tokenKey,
+  }) async {
     try {
-      var response = await _httpService.getNearbyPlaces(location, radius);
+      Response response;
+      if (null == tokenKey) {
+        response = await _httpService.getNearbyPlaces(location!, radius!);
+      } else {
+        response = await _httpService.getMoreNearbyPlaces(tokenKey);
+      }
       var json = convert.jsonDecode(response.body);
       var placesJson = json['results'] as List;
 
@@ -41,6 +51,36 @@ class PlaceAutocompleteRepo {
       rethrow;
     }
   }
+
+  // Future<Map<String, dynamic>> getMoreNearbyPlaces(String tokenKey) async {
+  //   try {
+  //     var response = await _httpService.getMoreNearbyPlaces(tokenKey);
+  //     var json = convert.jsonDecode(response.body);
+  //     var morePlacesJson = json['results'] as List;
+  //
+  //     // token for more nearbyPlaces
+  //     String token = json['next_page_token'] ?? 'none';
+  //
+  //     List<NearbyPlace> moreNearbyPlaces = <NearbyPlace>[];
+  //     for (var place in morePlacesJson) {
+  //       var location = place['geometry']['location'];
+  //       moreNearbyPlaces.add(
+  //         NearbyPlace(
+  //           position: LatLng(location['lat'], location['lng']),
+  //           name: place['name'],
+  //           types: place['types'].cast<String>(),
+  //           businessStatus: place['business_status'] ?? 'not available',
+  //         ),
+  //       );
+  //     }
+  //     return {
+  //       'nearby_places': moreNearbyPlaces,
+  //       'token': token,
+  //     };
+  //   } catch (exception) {
+  //     rethrow;
+  //   }
+  // }
 
   Future<Map<String, dynamic>> getDirection(
       String origin, String destination) async {

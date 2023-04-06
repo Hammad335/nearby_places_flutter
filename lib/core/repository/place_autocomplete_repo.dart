@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/src/response.dart';
@@ -45,7 +47,7 @@ class PlaceAutocompleteRepo {
             position: LatLng(location['lat'], location['lng']),
             name: place['name'] ?? 'No Name',
             types: place['types'].cast<String>(),
-            businessStatus: place['business_status'] ?? 'NOT_OPERATIONAL',
+            businessStatus: place['business_status'] ?? '-',
             photoReference: photoRef ?? '',
             rating: rating ?? 0.0,
           ),

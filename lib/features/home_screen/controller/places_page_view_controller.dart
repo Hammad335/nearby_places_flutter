@@ -29,8 +29,7 @@ class PlacesPageViewController extends GetxController {
     pageController = PageController(
       initialPage: 1,
       viewportFraction: 0.85,
-    )
-      ..addListener(_onScroll);
+    )..addListener(_onScroll);
   }
 
   @override
@@ -49,33 +48,19 @@ class PlacesPageViewController extends GetxController {
       cardTapped.value = false;
       photoGalleryIndex.value = 1;
       showBlankCard.value = false;
-      goToTappedPlace();
-      fetchImage();
+      _goToTappedPlace();
     }
   }
 
-  // image to place inside the tile in the pageView at bottom of map
-  void fetchImage() async {
-    if (null != pageController.page) {
-      if (_nearbyPlacesController.nearbyPlaces[pageController.page!.toInt()]
-          .photoReference.isNotEmpty) {
-        placeImg.value = _nearbyPlacesController
-            .nearbyPlaces[pageController.page!.toInt()].photoReference;
-      }
-    } else {
-      placeImg.value = '';
-    }
-  }
-
-  void goToTappedPlace() async {
+  void _goToTappedPlace() async {
     final GoogleMapController controller =
-    await _homeController.mapController.value.future;
+        await _homeController.mapController.value.future;
     _homeController.initMarkers();
 
     NearbyPlace tappedPlace =
-    _nearbyPlacesController.nearbyPlaces[pageController.page!.toInt()];
+        _nearbyPlacesController.nearbyPlaces[pageController.page!.toInt()];
 
-    // setting single place marker when tapped on any place
+    // setting single place marker when place cards/tiles are scrolled to specific place
     _nearbyPlacesController.setNearbyPlaceSingleMarker(
       tappedPlace.position,
       tappedPlace.types,
@@ -94,10 +79,9 @@ class PlacesPageViewController extends GetxController {
 
   toggleCardTapped() => cardTapped.value = !cardTapped.value;
 
-  String getPlaceImageUrl(int index) {
-    if (_nearbyPlacesController.nearbyPlaces[index].photoReference.isNotEmpty) {
-      return 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=$placeImg&key=${Constants
-          .API_KEY}';
+  String getPlaceImageUrl(String photoRef) {
+    if (photoRef.isNotEmpty) {
+      return 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=$photoRef&key=${Constants.API_KEY}';
     } else {
       return 'https://pic.onlinewebfonts.com/svg/img_546302.png';
     }

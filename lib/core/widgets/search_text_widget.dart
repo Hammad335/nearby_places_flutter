@@ -66,7 +66,7 @@ class SearchTextWidget extends StatelessWidget {
     return controller.isLoading.value
         ? const LoadingIndicator()
         : SizedBox(
-            width: controller.size.width * 0.26,
+            width: controller.size.width * 0.28,
             child: Row(
               children: [
                 IconButton(

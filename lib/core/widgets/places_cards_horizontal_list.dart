@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:get/get.dart';
 import 'package:nearby_places_flutter/core/models/models.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/home_controller.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/places_page_view_controller.dart';
+import 'widgets.dart';
 
 class PlacesCardsHorizontalList extends StatelessWidget {
   final HomeController homeController;
@@ -73,7 +73,7 @@ class PlaceCard extends StatelessWidget {
         child: Center(
           child: Container(
             height: controller.screenSize.height * 0.13,
-            width: controller.screenSize.width * 0.77,
+            width: controller.screenSize.width * 0.78,
             margin: const EdgeInsets.symmetric(
               horizontal: 10,
               vertical: 20,
@@ -95,31 +95,30 @@ class PlaceCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  controller.pageController.position.haveDimensions
-                      ? Container(
-                          width: 100,
-                          height: controller.screenSize.height * 0.13,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(10.0),
-                              bottomLeft: Radius.circular(10.0),
-                            ),
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                controller.getPlaceImageUrl(index),
-                              ),
-                              fit: BoxFit.fill,
-                            ),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+                  Container(
+                    width: 100,
+                    height: controller.screenSize.height * 0.13,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(10.0),
+                        bottomLeft: Radius.circular(10.0),
+                      ),
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          controller
+                              .getPlaceImageUrl(currentPlace.photoReference),
+                        ),
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                  ),
                   const SizedBox(width: 10),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
-                        width: controller.screenSize.width * 0.40,
+                        width: controller.screenSize.width * 0.38,
                         child: Text(
                           currentPlace.name,
                           maxLines: 1,
@@ -131,43 +130,20 @@ class PlaceCard extends StatelessWidget {
                               fontWeight: FontWeight.bold),
                         ),
                       ),
-                      RatingStars(
-                        value: currentPlace.rating,
-                        starCount: 5,
-                        starSize: 10,
-                        valueLabelColor: const Color(0xff9b9b9b),
-                        valueLabelTextStyle: const TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'WorkSans',
-                          fontWeight: FontWeight.w400,
-                          fontStyle: FontStyle.normal,
-                          fontSize: 12.0,
-                        ),
-                        valueLabelRadius: 10,
-                        maxValue: 5,
-                        starSpacing: 2,
-                        maxValueVisibility: false,
-                        valueLabelVisibility: true,
-                        animationDuration: const Duration(milliseconds: 1000),
-                        valueLabelPadding: const EdgeInsets.symmetric(
-                          vertical: 1,
-                          horizontal: 8,
-                        ),
-                        valueLabelMargin: const EdgeInsets.only(right: 8),
-                        starOffColor: const Color(0xffe7e8ea),
-                        starColor: Colors.yellow,
-                      ),
+                      PlaceRatings(currentPlace: currentPlace),
                       SizedBox(
                         width: 170.0,
                         child: Text(
                           currentPlace.businessStatus,
                           style: TextStyle(
-                              color:
-                                  currentPlace.businessStatus == 'OPERATIONAL'
-                                      ? Colors.green
-                                      : Colors.red,
-                              fontSize: 11.0,
-                              fontWeight: FontWeight.w700),
+                            color: currentPlace.businessStatus == 'OPERATIONAL'
+                                ? Colors.green
+                                : currentPlace.businessStatus == '-'
+                                    ? Colors.blue
+                                    : Colors.red,
+                            fontSize: 11.0,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       )
                     ],

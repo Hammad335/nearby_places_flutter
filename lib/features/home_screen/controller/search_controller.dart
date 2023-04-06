@@ -29,6 +29,7 @@ class SearchController extends GetxController {
   }
 
   void toggleGetDirections() {
+    searchToggle.value = false;
     getDirections.value = !getDirections.value;
     originTextController.value.text = '';
     destTextController.value.text = '';
@@ -38,6 +39,7 @@ class SearchController extends GetxController {
   }
 
   void toggleSearch() {
+    getDirections.value = false;
     searchToggle.value = !searchToggle.value;
     originTextController.value.text = '';
     _toggle();

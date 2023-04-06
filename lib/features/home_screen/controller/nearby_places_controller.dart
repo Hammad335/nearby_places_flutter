@@ -83,9 +83,9 @@ class NearbyPlacesController extends GetxController {
     return markerIcon;
   }
 
-  void _setNearbyPlacesMarkers() async {
-    _homeController.initMarkers();
-    for (var place in nearbyPlaces) {
+  void _setNearbyPlacesMarkers(List<NearbyPlace> places) async {
+    // _homeController.initMarkers();
+    for (var place in places) {
       final Uint8List markerIcon = await _getMarkerIcon(place.types);
       _homeController.setMarker(
         latLng: place.position,
@@ -127,11 +127,17 @@ class NearbyPlacesController extends GetxController {
               radius: radius.toInt(),
             );
           }
-          // nearbyPlaces.value = jsonResult['nearby_places'] as List<NearbyPlace>;
-          nearbyPlaces.addAll(jsonResult['nearby_places'] as List<NearbyPlace>);
+
+          // for showing markers each time to new places only
+          List<NearbyPlace> places =
+              jsonResult['nearby_places'] as List<NearbyPlace>;
+
+          nearbyPlaces.addAll(places);
           _tokenKey = jsonResult['token'] ?? 'none'; // for more nearbyPlaces
           isLoading.value = false;
-          _setNearbyPlacesMarkers();
+
+          // showing markers to newly fetched places
+          _setNearbyPlacesMarkers(places);
 
           // this shows horizontal pageView at bottom showing cards for each place
           _searchController.pressedNear.value = true;

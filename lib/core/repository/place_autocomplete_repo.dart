@@ -34,12 +34,20 @@ class PlaceAutocompleteRepo {
       List<NearbyPlace> nearbyPlaces = <NearbyPlace>[];
       for (var place in placesJson) {
         var location = place['geometry']['location'];
+        String? photoRef = place['photos'] != null
+            ? place['photos'][0]['photo_reference']
+            : null;
+        double? rating =
+            place['rating'] != null ? place['rating'].toDouble() : 0.0;
+
         nearbyPlaces.add(
           NearbyPlace(
             position: LatLng(location['lat'], location['lng']),
-            name: place['name'],
+            name: place['name'] ?? 'No Name',
             types: place['types'].cast<String>(),
-            businessStatus: place['business_status'] ?? 'not available',
+            businessStatus: place['business_status'] ?? 'NOT_OPERATIONAL',
+            photoReference: photoRef ?? '',
+            rating: rating ?? 0.0,
           ),
         );
       }

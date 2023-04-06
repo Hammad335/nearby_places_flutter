@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -30,7 +29,7 @@ class NearbyPlacesController extends GetxController {
   NearbyPlacesController() {
     circles = <Circle>{}.obs;
     _timer = null;
-    nearbyPlaces = <NearbyPlace>[].obs;
+    initNearbyPlaces();
   }
 
   @override
@@ -39,6 +38,10 @@ class NearbyPlacesController extends GetxController {
     _homeController = Get.find<HomeController>();
     _searchController = Get.find<SearchController>();
     _placeAutocompleteRepo = Get.find<PlaceAutocompleteRepo>();
+  }
+
+  void initNearbyPlaces() {
+    nearbyPlaces = <NearbyPlace>[].obs;
   }
 
   Future<Uint8List> _getBytesFromAsset(String path, int width) async {
@@ -68,18 +71,20 @@ class NearbyPlacesController extends GetxController {
       markerIcon = await _getBytesFromAsset('assets/icons/hotels.png', 75);
     } else if (types.contains('store')) {
       markerIcon =
-      await _getBytesFromAsset('assets/icons/retail-stores.png', 75);
+          await _getBytesFromAsset('assets/icons/retail-stores.png', 75);
     } else if (types.contains('locality')) {
       markerIcon =
-      await _getBytesFromAsset('assets/icons/local-services.png', 75);
+          await _getBytesFromAsset('assets/icons/local-services.png', 75);
     } else {
+      // show more icons based on different places
+      // icons are stored in assets
       markerIcon = await _getBytesFromAsset('assets/icons/places.png', 75);
     }
     return markerIcon;
   }
 
   void _setNearbyPlacesMarkers() async {
-    // _homeController.markers = <Marker>{}.obs;
+    _homeController.initMarkers();
     for (var place in nearbyPlaces) {
       final Uint8List markerIcon = await _getMarkerIcon(place.types);
       _homeController.setMarker(
@@ -87,6 +92,14 @@ class NearbyPlacesController extends GetxController {
         markerIcon: BitmapDescriptor.fromBytes(markerIcon),
       );
     }
+  }
+
+  void setNearbyPlaceSingleMarker(LatLng position, List<String> types) async {
+    final Uint8List markerIcon = await _getMarkerIcon(types);
+    _homeController.setMarker(
+      latLng: position,
+      markerIcon: BitmapDescriptor.fromBytes(markerIcon),
+    );
   }
 
   void getNearbyPlaces() {
@@ -97,30 +110,36 @@ class NearbyPlacesController extends GetxController {
     try {
       _timer = Timer(const Duration(seconds: 2), () async {
         if (_searchController.pressedNear.value && 'none' == _tokenKey) {
+          // it means all nearby places are fetched and there are no more place left
           isLoading.value = false;
-        }
-        else {
+          Utils.showInfoSnackBar('All places are fetched, no more places!');
+        } else {
           Map<String, dynamic> jsonResult;
           if (_searchController.pressedNear.value) {
+            // showing more  nearby-places, onClicking button again
             jsonResult = await _placeAutocompleteRepo.getNearbyPlaces(
               tokenKey: _tokenKey,
             );
           } else {
+            // fetching nearby places for the first time onClick
             jsonResult = await _placeAutocompleteRepo.getNearbyPlaces(
               location: tappedPoint.value,
               radius: radius.toInt(),
             );
           }
-          nearbyPlaces.value = jsonResult['nearby_places'] as List<NearbyPlace>;
+          // nearbyPlaces.value = jsonResult['nearby_places'] as List<NearbyPlace>;
+          nearbyPlaces.addAll(jsonResult['nearby_places'] as List<NearbyPlace>);
           _tokenKey = jsonResult['token'] ?? 'none'; // for more nearbyPlaces
           isLoading.value = false;
           _setNearbyPlacesMarkers();
+
+          // this shows horizontal pageView at bottom showing cards for each place
           _searchController.pressedNear.value = true;
         }
       });
     } catch (exception) {
       isLoading.value = false;
-      Utils.showSnackBar(exception.toString());
+      Utils.showErrorSnackBar(exception.toString());
     }
   }
 
@@ -133,7 +152,7 @@ class NearbyPlacesController extends GetxController {
   void drawCircle(LatLng point) async {
     tappedPoint = point.obs;
     final GoogleMapController mapController =
-    await _homeController.mapController.value.future;
+        await _homeController.mapController.value.future;
 
     mapController.animateCamera(
       CameraUpdate.newCameraPosition(
@@ -150,8 +169,7 @@ class NearbyPlacesController extends GetxController {
         strokeWidth: 1,
       ),
     );
-    _searchController.getDirections.value = false;
-    _searchController.searchToggle.value = false;
+    _searchController.emptyNearbyPlacesList();
     _homeController.markers.clear();
     radiusSlider.value = true;
     // _searchController.update();

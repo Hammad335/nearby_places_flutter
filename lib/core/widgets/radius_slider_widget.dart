@@ -37,7 +37,7 @@ class RadiusSliderWidget extends StatelessWidget {
                     ? const LoadingIndicator()
                     : const Icon(
                         Icons.near_me,
-                        // color: Colors.blue,
+                        color: Colors.black,
                       ),
               ),
             ),

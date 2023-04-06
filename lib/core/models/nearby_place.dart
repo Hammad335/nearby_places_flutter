@@ -5,12 +5,16 @@ class NearbyPlace {
   String name;
   List<String> types;
   String businessStatus;
+  String photoReference;
+  double rating;
 
   NearbyPlace({
     required this.position,
     required this.name,
     required this.types,
     required this.businessStatus,
+    required this.photoReference,
+    required this.rating,
   });
 
   Map<String, dynamic> toJson() {
@@ -19,6 +23,8 @@ class NearbyPlace {
       'name': name,
       'types': types,
       'businessStatus': businessStatus,
+      'photoReference': photoReference,
+      'rating': rating,
     };
   }
 
@@ -28,6 +34,8 @@ class NearbyPlace {
       name: map['name'] as String,
       types: map['types'].cast<String>(),
       businessStatus: map['businessStatus'] as String,
+      photoReference: map['photoReference'] as String,
+      rating: map['rating'] as double,
     );
   }
 }

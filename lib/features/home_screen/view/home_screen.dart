@@ -79,6 +79,11 @@ class HomeScreen extends StatelessWidget {
                           )
                         : const SizedBox.shrink(),
                   ),
+                  Obx(
+                    () => _controller.searchController.pressedNear.value
+                        ? PlacesCardsHorizontalList(homeController: _controller)
+                        : const SizedBox.shrink(),
+                  ),
                 ],
               )
             ],

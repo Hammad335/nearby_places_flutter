@@ -5,12 +5,13 @@ import 'package:nearby_places_flutter/features/home_screen/controller/home_contr
 import 'package:nearby_places_flutter/features/home_screen/controller/nearby_places_controller.dart';
 
 class SearchController extends GetxController {
-  late Rx<TextEditingController> originTextController;
-  late Rx<TextEditingController> destTextController;
   late HomeController _homeController;
   late NearbyPlacesController _nearbyPlacesController;
+
+  late Rx<TextEditingController> originTextController;
+  late Rx<TextEditingController> destTextController;
+
   RxBool searchToggle = false.obs;
-  RxBool cardTapped = false.obs;
   RxBool pressedNear = false.obs;
   RxBool getDirections = false.obs;
   RxBool showResult = false.obs;
@@ -43,13 +44,18 @@ class SearchController extends GetxController {
     _homeController.update();
   }
 
+  void emptyNearbyPlacesList() {
+    _nearbyPlacesController.initNearbyPlaces();
+    getDirections.value = false;
+    searchToggle.value = false;
+    pressedNear.value = false;
+  }
+
   _toggle() {
     showResult.value = false;
     _nearbyPlacesController.radiusSlider.value = false;
-    cardTapped.value = false;
     pressedNear.value = false;
-    // searchToggle.value = false;
-    _homeController.markers = <Marker>{}.obs;
+    _homeController.initMarkers();
     _nearbyPlacesController.circles.clear();
   }
 }

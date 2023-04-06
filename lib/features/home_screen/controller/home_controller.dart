@@ -33,7 +33,7 @@ class HomeController extends GetxController {
     searchController = Get.find<SearchController>();
     nearbyPlacesController = Get.find<NearbyPlacesController>();
     mapController = Completer<GoogleMapController>().obs;
-    markers = <Marker>{}.obs;
+    initMarkers();
     polylines = <Polyline>{}.obs;
     places = RxList<Place>();
     _timer = null;
@@ -41,9 +41,15 @@ class HomeController extends GetxController {
     polylineIdCounter = 1;
   }
 
+  initMarkers() {
+    markers = <Marker>{}.obs;
+  }
+
   init(BuildContext context) {
     this.context = context;
-    size = MediaQuery.of(context).size;
+    size = MediaQuery
+        .of(context)
+        .size;
   }
 
   void getDirection() async {
@@ -51,9 +57,9 @@ class HomeController extends GetxController {
       isLoading.value = true;
       var directions = await _placeAutocompleteRepo
           .getDirection(
-            searchController.originTextController.value.text,
-            searchController.destTextController.value.text,
-          )
+        searchController.originTextController.value.text,
+        searchController.destTextController.value.text,
+      )
           .timeout(const Duration(seconds: 5));
       isLoading.value = false;
       _setPolyline(directions['polyline_decoded']);
@@ -67,7 +73,7 @@ class HomeController extends GetxController {
       );
     } catch (exception) {
       isLoading.value = false;
-      Utils.showSnackBar(exception.toString());
+      Utils.showErrorSnackBar(exception.toString());
     }
   }
 
@@ -78,7 +84,7 @@ class HomeController extends GetxController {
       }
       _timer = Timer(
         const Duration(milliseconds: 700),
-        () async {
+            () async {
           if (text.length > 2) {
             isLoading.value = true;
             await _getSearchPlaces(text);
@@ -100,7 +106,7 @@ class HomeController extends GetxController {
         lng: placeLatLng['lng'],
       );
     } catch (exception) {
-      Utils.showSnackBar(exception.toString());
+      Utils.showErrorSnackBar(exception.toString());
     }
   }
 
@@ -140,7 +146,7 @@ class HomeController extends GetxController {
     Map<String, dynamic>? boundsSw,
   }) async {
     final GoogleMapController controller = await mapController.value.future;
-    markers = <Marker>{}.obs;
+    initMarkers();
     setMarker(latLng: LatLng(lat, lng));
     if (null == boundsNe &&
         null == boundsSw &&
@@ -171,7 +177,7 @@ class HomeController extends GetxController {
       final result = await _placeAutocompleteRepo.searchPlaces(query);
       places.value = result;
     } catch (exception) {
-      Utils.showSnackBar(exception.toString());
+      Utils.showErrorSnackBar(exception.toString());
     }
   }
 }

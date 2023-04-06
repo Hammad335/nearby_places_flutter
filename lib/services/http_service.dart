@@ -1,8 +1,9 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:nearby_places_flutter/constants/constants.dart';
 
 // todo place your api key here
-const API_KEY = 'your-api-key';
+const API_KEY = Constants.API_KEY;
 const TYPE = 'geocode';
 
 class HttpService {

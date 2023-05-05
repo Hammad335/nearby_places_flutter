@@ -84,6 +84,13 @@ class HomeScreen extends StatelessWidget {
                         ? PlacesCardsHorizontalList(homeController: _controller)
                         : const SizedBox.shrink(),
                   ),
+                  Obx(
+                    () => _controller.placesPageViewController.cardTapped.value
+                        ? PlaceDetailsFlipCard(
+                            controller: _controller.placesPageViewController,
+                          )
+                        : const SizedBox.shrink(),
+                  ),
                 ],
               )
             ],

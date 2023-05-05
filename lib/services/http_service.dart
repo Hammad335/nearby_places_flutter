@@ -1,11 +1,7 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:nearby_places_flutter/constants/constants.dart';
-
-import '../core/utils/utils.dart';
 
 // todo place your api key here
 const API_KEY = Constants.API_KEY;

@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
 import 'package:nearby_places_flutter/core/repository/place_autocomplete_repo.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/nearby_places_controller.dart';
+import 'package:nearby_places_flutter/features/home_screen/controller/places_page_view_controller.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/search_controller.dart';
 import '../../../core/models/models.dart';
 import '../../../core/utils/utils.dart';
@@ -16,6 +17,7 @@ class HomeController extends GetxController {
   late PlaceAutocompleteRepo _placeAutocompleteRepo;
   late SearchController searchController;
   late NearbyPlacesController nearbyPlacesController;
+  late PlacesPageViewController placesPageViewController;
 
   late Rx<Completer<GoogleMapController>> mapController;
   late RxSet<Marker> markers;
@@ -32,6 +34,7 @@ class HomeController extends GetxController {
     _placeAutocompleteRepo = Get.find<PlaceAutocompleteRepo>();
     searchController = Get.find<SearchController>();
     nearbyPlacesController = Get.find<NearbyPlacesController>();
+    placesPageViewController = Get.find<PlacesPageViewController>();
     mapController = Completer<GoogleMapController>().obs;
     initMarkers();
     polylines = <Polyline>{}.obs;
@@ -47,9 +50,7 @@ class HomeController extends GetxController {
 
   init(BuildContext context) {
     this.context = context;
-    size = MediaQuery
-        .of(context)
-        .size;
+    size = MediaQuery.of(context).size;
   }
 
   void getDirection() async {
@@ -57,9 +58,9 @@ class HomeController extends GetxController {
       isLoading.value = true;
       var directions = await _placeAutocompleteRepo
           .getDirection(
-        searchController.originTextController.value.text,
-        searchController.destTextController.value.text,
-      )
+            searchController.originTextController.value.text,
+            searchController.destTextController.value.text,
+          )
           .timeout(const Duration(seconds: 5));
       isLoading.value = false;
       _setPolyline(directions['polyline_decoded']);
@@ -84,7 +85,7 @@ class HomeController extends GetxController {
       }
       _timer = Timer(
         const Duration(milliseconds: 700),
-            () async {
+        () async {
           if (text.length > 2) {
             isLoading.value = true;
             await _getSearchPlaces(text);

@@ -1,10 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/src/response.dart';
 import 'package:nearby_places_flutter/core/models/models.dart';
-import 'package:nearby_places_flutter/core/utils/utils.dart';
 import 'package:nearby_places_flutter/services/http_service.dart';
 import 'dart:convert' as convert;
 
@@ -42,12 +40,17 @@ class PlaceAutocompleteRepo {
         double? rating =
             place['rating'] != null ? place['rating'].toDouble() : 0.0;
 
+        print(place);
+
         nearbyPlaces.add(
           NearbyPlace(
             position: LatLng(location['lat'], location['lng']),
             name: place['name'] ?? 'No Name',
             types: place['types'].cast<String>(),
             businessStatus: place['business_status'] ?? '-',
+            formattedAddress: place['formatted_address'] ?? 'None Given',
+            formattedPhoneNumber:
+                place['formatted_phone_number'] ?? 'None Given',
             photoReference: photoRef ?? '',
             rating: rating ?? 0.0,
           ),

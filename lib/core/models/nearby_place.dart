@@ -5,6 +5,8 @@ class NearbyPlace {
   String name;
   List<String> types;
   String businessStatus;
+  String formattedAddress;
+  String formattedPhoneNumber;
   String photoReference;
   double rating;
 
@@ -13,6 +15,8 @@ class NearbyPlace {
     required this.name,
     required this.types,
     required this.businessStatus,
+    required this.formattedAddress,
+    required this.formattedPhoneNumber,
     required this.photoReference,
     required this.rating,
   });
@@ -23,6 +27,8 @@ class NearbyPlace {
       'name': name,
       'types': types,
       'businessStatus': businessStatus,
+      'formattedAddress': formattedAddress,
+      'formattedPhoneNumber': formattedPhoneNumber,
       'photoReference': photoReference,
       'rating': rating,
     };
@@ -34,6 +40,8 @@ class NearbyPlace {
       name: map['name'] as String,
       types: map['types'].cast<String>(),
       businessStatus: map['businessStatus'] as String,
+      formattedAddress: map['formattedAddress'] as String,
+      formattedPhoneNumber: map['formattedPhoneNumber'] as String,
       photoReference: map['photoReference'] as String,
       rating: map['rating'] as double,
     );

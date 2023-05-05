@@ -67,7 +67,7 @@ class PlaceCard extends StatelessWidget {
       },
       child: InkWell(
         onTap: () async {
-          controller.toggleCardTapped();
+          controller.toggleCardTapped(index);
           // Todo
         },
         child: Center(

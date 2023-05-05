@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:nearby_places_flutter/core/models/models.dart';
 import 'package:nearby_places_flutter/core/repository/place_autocomplete_repo.dart';
+import 'package:nearby_places_flutter/features/home_screen/controller/places_page_view_controller.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/search_controller.dart';
 import '../../../core/utils/utils.dart';
 import 'home_controller.dart';
@@ -13,6 +14,7 @@ import 'dart:ui' as ui;
 class NearbyPlacesController extends GetxController {
   late HomeController _homeController;
   late SearchController _searchController;
+  late PlacesPageViewController _placesPageViewController;
   late PlaceAutocompleteRepo _placeAutocompleteRepo;
 
   late RxSet<Circle> circles;
@@ -27,9 +29,9 @@ class NearbyPlacesController extends GetxController {
   late Timer? _timer;
 
   NearbyPlacesController() {
-    circles = <Circle>{}.obs;
     _timer = null;
-    initNearbyPlaces();
+    _initCircles();
+    _initNearbyPlaces();
   }
 
   @override
@@ -37,11 +39,16 @@ class NearbyPlacesController extends GetxController {
     super.onReady();
     _homeController = Get.find<HomeController>();
     _searchController = Get.find<SearchController>();
+    _placesPageViewController = Get.find<PlacesPageViewController>();
     _placeAutocompleteRepo = Get.find<PlaceAutocompleteRepo>();
   }
 
-  void initNearbyPlaces() {
+  void _initNearbyPlaces() {
     nearbyPlaces = <NearbyPlace>[].obs;
+  }
+
+  void _initCircles() {
+    circles = <Circle>{}.obs;
   }
 
   Future<Uint8List> _getBytesFromAsset(String path, int width) async {
@@ -175,10 +182,21 @@ class NearbyPlacesController extends GetxController {
         strokeWidth: 1,
       ),
     );
-    _searchController.emptyNearbyPlacesList();
-    _homeController.markers.clear();
+    _initNearbyPlaces();
+    _searchController.hideOtherViews();
+    _homeController.initMarkers();
     radiusSlider.value = true;
-    // _searchController.update();
+    _homeController.update();
+  }
+
+  void closeSlider() {
+    radiusSlider.value = false;
+    _searchController.pressedNear.value = false;
+    _placesPageViewController.cardTapped.value = false;
+    radius.value = 3000;
+    _initCircles();
+    _homeController.initMarkers();
+    _initNearbyPlaces();
     _homeController.update();
   }
 }

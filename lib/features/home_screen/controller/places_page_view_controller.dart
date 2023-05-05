@@ -18,7 +18,7 @@ class PlacesPageViewController extends GetxController {
   RxBool cardTapped = false.obs;
   RxInt prevPage = 0.obs;
   RxInt photoGalleryIndex = 0.obs;
-  RxString placeImg = ''.obs;
+  RxInt tappedCardIndex = 1.obs;
   RxBool showBlankCard = false.obs;
 
   PlacesPageViewController() {
@@ -58,7 +58,7 @@ class PlacesPageViewController extends GetxController {
     _homeController.initMarkers();
 
     NearbyPlace tappedPlace =
-        _nearbyPlacesController.nearbyPlaces[pageController.page!.toInt()];
+        getNearbyPlaceByIndex(pageController.page!.toInt());
 
     // setting single place marker when place cards/tiles are scrolled to specific place
     _nearbyPlacesController.setNearbyPlaceSingleMarker(
@@ -77,13 +77,34 @@ class PlacesPageViewController extends GetxController {
     ));
   }
 
-  toggleCardTapped() => cardTapped.value = !cardTapped.value;
+  toggleCardTapped(int index) {
+    cardTapped.value = !cardTapped.value;
+    if (cardTapped.value) {
+      _moveCameraSlightly();
+    }
+  }
+
+  Future<void> _moveCameraSlightly() async {
+    final GoogleMapController controller =
+        await _homeController.mapController.value.future;
+    NearbyPlace tappedPlace =
+        getNearbyPlaceByIndex(pageController.page!.toInt());
+    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
+      target: LatLng(
+        tappedPlace.position.latitude + 0.0125,
+        tappedPlace.position.longitude + 0.005,
+      ),
+      zoom: 14,
+      bearing: 45,
+      tilt: 45,
+    )));
+  }
 
   String getPlaceImageUrl(String photoRef) {
     if (photoRef.isNotEmpty) {
-      return 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=$photoRef&key=${Constants.API_KEY}';
+      return '${Constants.BASE_IMAGE_URL}$photoRef&key=${Constants.API_KEY}';
     } else {
-      return 'https://pic.onlinewebfonts.com/svg/img_546302.png';
+      return Constants.DEFAULT_IMAGE_URL;
     }
   }
 

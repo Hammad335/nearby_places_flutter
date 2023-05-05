@@ -41,6 +41,14 @@ class RadiusSliderWidget extends StatelessWidget {
                       ),
               ),
             ),
+            IconButton(
+              onPressed: () {
+                nearbyPlacesController.closeSlider();
+              },
+              icon: const Icon(
+                Icons.close,
+              ),
+            ),
           ],
         ),
       ),

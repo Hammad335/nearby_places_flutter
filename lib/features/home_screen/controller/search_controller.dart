@@ -46,8 +46,7 @@ class SearchController extends GetxController {
     _homeController.update();
   }
 
-  void emptyNearbyPlacesList() {
-    _nearbyPlacesController.initNearbyPlaces();
+  void hideOtherViews() {
     getDirections.value = false;
     searchToggle.value = false;
     pressedNear.value = false;

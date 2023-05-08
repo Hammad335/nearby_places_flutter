@@ -1,7 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Constants {
-  static const API_KEY = 'your-api-key';
+  static const API_KEY = 'AIzaSyCukbDp8yOAB4CbH2WpchQ1IDpwBQQlzpw';
 
   static const BASE_IMAGE_URL = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=';
 

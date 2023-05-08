@@ -1,6 +1,8 @@
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:nearby_places_flutter/core/models/models.dart';
+import 'package:nearby_places_flutter/core/widgets/widgets.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/places_page_view_controller.dart';
 
 class PlaceDetailsFlipCard extends StatelessWidget {
@@ -57,9 +59,36 @@ class PlaceDetailsFlipCard extends StatelessWidget {
           ),
         ),
         back: Container(
-          width: 225,
-          height: 300,
-          // color: Colors.green,
+          height: 300.0,
+          width: 225.0,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.95),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    FlipCardBackTab(
+                      controller: controller,
+                      label: 'Reviews',
+                      onPressed: () => controller.toggleReviewsTab(),
+                      isReviewTab: true,
+                    ),
+                    FlipCardBackTab(
+                      controller: controller,
+                      label: 'Photos',
+                      onPressed: () => controller.togglePhotosTab(),
+                      isReviewTab: false,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

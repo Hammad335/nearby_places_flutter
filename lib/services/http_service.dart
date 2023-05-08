@@ -44,9 +44,9 @@ class HttpService {
     }
   }
 
-  Future<http.Response> getPlace(String placeId) async {
+  Future<http.Response> getPlace(String placeId, String fields) async {
     final String url =
-        'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$API_KEY';
+        'https://maps.googleapis.com/maps/api/place/details/json?fields=$fields&place_id=$placeId&key=$API_KEY';
     try {
       return await http.get(Uri.parse(url));
     } catch (exception) {

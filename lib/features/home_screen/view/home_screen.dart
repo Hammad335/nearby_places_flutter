@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: _controller.size.width,
-                    height: _controller.size.height - 32,
+                    height: _controller.getHeight,
                     child: GetBuilder<HomeController>(
                         init: _controller,
                         builder: (controller) {

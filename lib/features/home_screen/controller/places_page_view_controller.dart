@@ -21,6 +21,9 @@ class PlacesPageViewController extends GetxController {
   RxInt tappedCardIndex = 1.obs;
   RxBool showBlankCard = false.obs;
 
+  RxBool isReviewsTabSelected = true.obs;
+  RxBool isPhotosTabSelected = false.obs;
+
   PlacesPageViewController() {
     initPageController();
   }
@@ -41,6 +44,16 @@ class PlacesPageViewController extends GetxController {
   }
 
   Size get screenSize => _homeController.size;
+
+  void toggleReviewsTab() {
+    isReviewsTabSelected.value = true;
+    isPhotosTabSelected.value = false;
+  }
+
+  void togglePhotosTab() {
+    isReviewsTabSelected.value = false;
+    isPhotosTabSelected.value = true;
+  }
 
   void _onScroll() {
     if (pageController.page!.toInt() != prevPage.value) {

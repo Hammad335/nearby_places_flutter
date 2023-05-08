@@ -9,3 +9,4 @@ export 'radius_slider_widget.dart';
 export 'places_cards_horizontal_list.dart';
 export 'place_ratings.dart';
 export 'place_details_flip_card.dart';
+export 'flip_card_back_tab.dart';

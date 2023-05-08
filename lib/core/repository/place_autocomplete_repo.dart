@@ -32,15 +32,18 @@ class PlaceAutocompleteRepo {
       String token = json['next_page_token'] ?? 'none';
 
       List<NearbyPlace> nearbyPlaces = <NearbyPlace>[];
+      String fields = 'formatted_address%2Cformatted_phone_number';
+      
       for (var place in placesJson) {
+        // fetching more place details like address and contact number
+        var placeDetails = await getPlaceById(place['place_id'], fields);
+
         var location = place['geometry']['location'];
         String? photoRef = place['photos'] != null
             ? place['photos'][0]['photo_reference']
             : null;
         double? rating =
-            place['rating'] != null ? place['rating'].toDouble() : 0.0;
-
-        print(place);
+        place['rating'] != null ? place['rating'].toDouble() : 0.0;
 
         nearbyPlaces.add(
           NearbyPlace(
@@ -48,9 +51,9 @@ class PlaceAutocompleteRepo {
             name: place['name'] ?? 'No Name',
             types: place['types'].cast<String>(),
             businessStatus: place['business_status'] ?? '-',
-            formattedAddress: place['formatted_address'] ?? 'None Given',
+            formattedAddress: placeDetails['formatted_address'] ?? 'None Given',
             formattedPhoneNumber:
-                place['formatted_phone_number'] ?? 'None Given',
+            placeDetails['formatted_phone_number'] ?? 'None Given',
             photoReference: photoRef ?? '',
             rating: rating ?? 0.0,
           ),
@@ -65,38 +68,8 @@ class PlaceAutocompleteRepo {
     }
   }
 
-  // Future<Map<String, dynamic>> getMoreNearbyPlaces(String tokenKey) async {
-  //   try {
-  //     var response = await _httpService.getMoreNearbyPlaces(tokenKey);
-  //     var json = convert.jsonDecode(response.body);
-  //     var morePlacesJson = json['results'] as List;
-  //
-  //     // token for more nearbyPlaces
-  //     String token = json['next_page_token'] ?? 'none';
-  //
-  //     List<NearbyPlace> moreNearbyPlaces = <NearbyPlace>[];
-  //     for (var place in morePlacesJson) {
-  //       var location = place['geometry']['location'];
-  //       moreNearbyPlaces.add(
-  //         NearbyPlace(
-  //           position: LatLng(location['lat'], location['lng']),
-  //           name: place['name'],
-  //           types: place['types'].cast<String>(),
-  //           businessStatus: place['business_status'] ?? 'not available',
-  //         ),
-  //       );
-  //     }
-  //     return {
-  //       'nearby_places': moreNearbyPlaces,
-  //       'token': token,
-  //     };
-  //   } catch (exception) {
-  //     rethrow;
-  //   }
-  // }
-
-  Future<Map<String, dynamic>> getDirection(
-      String origin, String destination) async {
+  Future<Map<String, dynamic>> getDirection(String origin,
+      String destination) async {
     try {
       var response = await _httpService.getDirections(origin, destination);
       var json = convert.jsonDecode(response.body);
@@ -115,9 +88,10 @@ class PlaceAutocompleteRepo {
     }
   }
 
-  Future<Map<String, dynamic>> getPlace(String placeId) async {
+  Future<Map<String, dynamic>> getPlaceById(String placeId,
+      String fields) async {
     try {
-      var response = await _httpService.getPlace(placeId);
+      var response = await _httpService.getPlace(placeId, fields);
       var json = convert.jsonDecode(response.body);
       return json['result'] as Map<String, dynamic>;
     } catch (exception) {

@@ -13,6 +13,7 @@ import '../../../core/utils/utils.dart';
 class HomeController extends GetxController {
   late BuildContext context;
   late Size size;
+  late MediaQueryData mediaQuery;
 
   late PlaceAutocompleteRepo _placeAutocompleteRepo;
   late SearchController searchController;
@@ -51,7 +52,15 @@ class HomeController extends GetxController {
   init(BuildContext context) {
     this.context = context;
     size = MediaQuery.of(context).size;
+    mediaQuery = MediaQuery.of(context);
   }
+
+  double get getHeight =>
+      size.height -
+      mediaQuery.viewInsets.bottom -
+      mediaQuery.viewInsets.top -
+      mediaQuery.viewPadding.top -
+      mediaQuery.viewPadding.bottom;
 
   void getDirection() async {
     try {
@@ -100,7 +109,8 @@ class HomeController extends GetxController {
   Future<void> getPlaceById(String placeId) async {
     searchController.showResult.value = false;
     try {
-      var place = await _placeAutocompleteRepo.getPlace(placeId);
+      String fields = 'geometry';
+      var place = await _placeAutocompleteRepo.getPlaceById(placeId, fields);
       final placeLatLng = place['geometry']['location'];
       _gotoSearchPlace(
         lat: placeLatLng['lat'],

@@ -197,6 +197,7 @@ class NearbyPlacesController extends GetxController {
     _initCircles();
     _homeController.initMarkers();
     _initNearbyPlaces();
+    _placesPageViewController.update();
     _homeController.update();
   }
 }

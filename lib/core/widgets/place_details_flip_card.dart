@@ -1,9 +1,10 @@
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nearby_places_flutter/core/models/models.dart';
 import 'package:nearby_places_flutter/core/widgets/widgets.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/places_page_view_controller.dart';
+
+import '../utils/my_scroll_behaviour.dart';
 
 class PlaceDetailsFlipCard extends StatelessWidget {
   final PlacesPageViewController controller;
@@ -12,8 +13,6 @@ class PlaceDetailsFlipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    NearbyPlace tappedPlace = controller
-        .getNearbyPlaceByIndex(controller.pageController.page!.toInt());
     return Positioned(
       top: 100,
       left: 15,
@@ -27,34 +26,46 @@ class PlaceDetailsFlipCard extends StatelessWidget {
               Radius.circular(8),
             ),
           ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Container(
-                  width: 175,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8),
-                    ),
-                    image: DecorationImage(
-                      image: NetworkImage(
-                        controller.getPlaceImageUrl(tappedPlace.photoReference),
+          child: ScrollConfiguration(
+            behavior: MyScrollBehaviour(),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    width: 175,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        topRight: Radius.circular(8),
                       ),
-                      fit: BoxFit.fill,
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          controller.getPlaceImageUrl(
+                            controller.tappedPlace.value!.photoReference,
+                          ),
+                        ),
+                        fit: BoxFit.fill,
+                      ),
                     ),
                   ),
-                ),
-                DetailRow(
-                  caption: 'Address : ',
-                  value: tappedPlace.formattedAddress,
-                ),
-                DetailRow(
-                  caption: 'Contact : ',
-                  value: tappedPlace.formattedPhoneNumber,
-                ),
-              ],
+                  Obx(
+                    () => Column(
+                      children: [
+                        DetailRow(
+                          caption: 'Address : ',
+                          value: controller.tappedPlace.value!.formattedAddress,
+                        ),
+                        DetailRow(
+                          caption: 'Contact : ',
+                          value: controller
+                              .tappedPlace.value!.formattedPhoneNumber,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

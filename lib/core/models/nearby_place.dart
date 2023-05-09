@@ -1,6 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class NearbyPlace {
+  String placeId;
   LatLng position;
   String name;
   List<String> types;
@@ -11,6 +12,7 @@ class NearbyPlace {
   double rating;
 
   NearbyPlace({
+    required this.placeId,
     required this.position,
     required this.name,
     required this.types,
@@ -23,6 +25,7 @@ class NearbyPlace {
 
   Map<String, dynamic> toJson() {
     return {
+      'placeId': placeId,
       'position': position,
       'name': name,
       'types': types,
@@ -36,6 +39,7 @@ class NearbyPlace {
 
   factory NearbyPlace.fromJson(Map<String, dynamic> map) {
     return NearbyPlace(
+      placeId: map['placeId'] as String,
       position: map['position'] as LatLng,
       name: map['name'] as String,
       types: map['types'].cast<String>(),
@@ -46,4 +50,10 @@ class NearbyPlace {
       rating: map['rating'] as double,
     );
   }
+
+  set setFormattedAdress(String formattedAddress) =>
+      this.formattedAddress = formattedAddress;
+
+  set setformattedPhoneNumber(String formattedPhoneNumber) =>
+      this.formattedPhoneNumber = formattedPhoneNumber;
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:get/get.dart';
+import 'package:nearby_places_flutter/constants/constants.dart';
 import 'package:nearby_places_flutter/core/repository/place_autocomplete_repo.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/nearby_places_controller.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/places_page_view_controller.dart';
@@ -109,8 +110,8 @@ class HomeController extends GetxController {
   Future<void> getPlaceById(String placeId) async {
     searchController.showResult.value = false;
     try {
-      String fields = 'geometry';
-      var place = await _placeAutocompleteRepo.getPlaceById(placeId, fields);
+      var place = await _placeAutocompleteRepo.getPlaceById(
+          placeId, Constants.PLACE_GEOMERY_FIELD);
       final placeLatLng = place['geometry']['location'];
       _gotoSearchPlace(
         lat: placeLatLng['lat'],

@@ -66,9 +66,8 @@ class PlaceCard extends StatelessWidget {
         );
       },
       child: InkWell(
-        onTap: () async {
+        onTap: () {
           controller.toggleCardTapped(index);
-          // Todo
         },
         child: Center(
           child: Container(
@@ -108,7 +107,7 @@ class PlaceCard extends StatelessWidget {
                           controller
                               .getPlaceImageUrl(currentPlace.photoReference),
                         ),
-                        fit: BoxFit.fill,
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),

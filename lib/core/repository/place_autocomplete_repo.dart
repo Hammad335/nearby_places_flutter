@@ -32,28 +32,24 @@ class PlaceAutocompleteRepo {
       String token = json['next_page_token'] ?? 'none';
 
       List<NearbyPlace> nearbyPlaces = <NearbyPlace>[];
-      String fields = 'formatted_address%2Cformatted_phone_number';
-      
-      for (var place in placesJson) {
-        // fetching more place details like address and contact number
-        var placeDetails = await getPlaceById(place['place_id'], fields);
 
+      for (var place in placesJson) {
         var location = place['geometry']['location'];
         String? photoRef = place['photos'] != null
             ? place['photos'][0]['photo_reference']
             : null;
         double? rating =
-        place['rating'] != null ? place['rating'].toDouble() : 0.0;
+            place['rating'] != null ? place['rating'].toDouble() : 0.0;
 
         nearbyPlaces.add(
           NearbyPlace(
+            placeId: place['place_id'],
             position: LatLng(location['lat'], location['lng']),
             name: place['name'] ?? 'No Name',
             types: place['types'].cast<String>(),
             businessStatus: place['business_status'] ?? '-',
-            formattedAddress: placeDetails['formatted_address'] ?? 'None Given',
-            formattedPhoneNumber:
-            placeDetails['formatted_phone_number'] ?? 'None Given',
+            formattedAddress: '',
+            formattedPhoneNumber: '',
             photoReference: photoRef ?? '',
             rating: rating ?? 0.0,
           ),
@@ -68,8 +64,8 @@ class PlaceAutocompleteRepo {
     }
   }
 
-  Future<Map<String, dynamic>> getDirection(String origin,
-      String destination) async {
+  Future<Map<String, dynamic>> getDirection(
+      String origin, String destination) async {
     try {
       var response = await _httpService.getDirections(origin, destination);
       var json = convert.jsonDecode(response.body);
@@ -88,8 +84,8 @@ class PlaceAutocompleteRepo {
     }
   }
 
-  Future<Map<String, dynamic>> getPlaceById(String placeId,
-      String fields) async {
+  Future<Map<String, dynamic>> getPlaceById(
+      String placeId, String fields) async {
     try {
       var response = await _httpService.getPlace(placeId, fields);
       var json = convert.jsonDecode(response.body);

@@ -129,7 +129,7 @@ class PlaceCard extends StatelessWidget {
                               fontWeight: FontWeight.bold),
                         ),
                       ),
-                      PlaceRatings(currentPlace: currentPlace),
+                      PlaceRatings(rating: currentPlace.rating),
                       SizedBox(
                         width: 170.0,
                         child: Text(

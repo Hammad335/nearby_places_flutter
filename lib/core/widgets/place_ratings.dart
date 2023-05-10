@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
-import '../models/models.dart';
 
 class PlaceRatings extends StatelessWidget {
   const PlaceRatings({
     super.key,
-    required this.currentPlace,
+    required this.rating,
   });
 
-  final NearbyPlace currentPlace;
+  final double rating;
 
   @override
   Widget build(BuildContext context) {
     return RatingStars(
-      value: currentPlace.rating,
+      value: rating,
       starCount: 5,
       starSize: 10,
       valueLabelColor: const Color(0xff9b9b9b),

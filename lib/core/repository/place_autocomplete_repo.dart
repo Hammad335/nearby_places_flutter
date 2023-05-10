@@ -43,16 +43,17 @@ class PlaceAutocompleteRepo {
 
         nearbyPlaces.add(
           NearbyPlace(
-            placeId: place['place_id'],
-            position: LatLng(location['lat'], location['lng']),
-            name: place['name'] ?? 'No Name',
-            types: place['types'].cast<String>(),
-            businessStatus: place['business_status'] ?? '-',
-            formattedAddress: '',
-            formattedPhoneNumber: '',
-            photoReference: photoRef ?? '',
-            rating: rating ?? 0.0,
-          ),
+              placeId: place['place_id'],
+              position: LatLng(location['lat'], location['lng']),
+              name: place['name'] ?? 'No Name',
+              types: place['types'].cast<String>(),
+              businessStatus: place['business_status'] ?? '-',
+              formattedAddress: '',
+              formattedPhoneNumber: '',
+              photoReference: photoRef ?? '',
+              rating: rating ?? 0.0,
+              reviews: [],
+              photos: []),
         );
       }
       return {

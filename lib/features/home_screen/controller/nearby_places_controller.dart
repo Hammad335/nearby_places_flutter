@@ -78,10 +78,10 @@ class NearbyPlacesController extends GetxController {
       markerIcon = await _getBytesFromAsset('assets/icons/hotels.png', 75);
     } else if (types.contains('store')) {
       markerIcon =
-          await _getBytesFromAsset('assets/icons/retail-stores.png', 75);
+      await _getBytesFromAsset('assets/icons/retail-stores.png', 75);
     } else if (types.contains('locality')) {
       markerIcon =
-          await _getBytesFromAsset('assets/icons/local-services.png', 75);
+      await _getBytesFromAsset('assets/icons/local-services.png', 75);
     } else {
       // show more icons based on different places
       // icons are stored in assets
@@ -137,7 +137,7 @@ class NearbyPlacesController extends GetxController {
 
           // for showing markers each time to new places only
           List<NearbyPlace> places =
-              jsonResult['nearby_places'] as List<NearbyPlace>;
+          jsonResult['nearby_places'] as List<NearbyPlace>;
 
           nearbyPlaces.addAll(places);
           _tokenKey = jsonResult['token'] ?? 'none'; // for more nearbyPlaces
@@ -165,7 +165,7 @@ class NearbyPlacesController extends GetxController {
   void drawCircle(LatLng point) async {
     tappedPoint = point.obs;
     final GoogleMapController mapController =
-        await _homeController.mapController.value.future;
+    await _homeController.mapController.value.future;
 
     mapController.animateCamera(
       CameraUpdate.newCameraPosition(
@@ -187,6 +187,10 @@ class NearbyPlacesController extends GetxController {
     _homeController.initMarkers();
     radiusSlider.value = true;
     _homeController.update();
+  }
+
+  void updatePlaceListItem(int index, NearbyPlace nearbyPlace) {
+    nearbyPlaces[index] = nearbyPlace;
   }
 
   void closeSlider() {

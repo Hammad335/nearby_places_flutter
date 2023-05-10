@@ -16,15 +16,13 @@ class PlacesPageViewController extends GetxController {
   late PageController pageController;
 
   Rx<NearbyPlace?> tappedPlace = null.obs;
-
   RxBool cardTapped = false.obs;
 
   RxInt prevPage = (-1).obs;
+  RxInt photoGalleryIndex = 0.obs;
+  RxBool showBlankCard = false.obs;
 
-  // RxInt photoGalleryIndex = 0.obs;
-  RxInt tappedCardIndex = 1.obs;
-
-  // RxBool showBlankCard = false.obs;
+  // RxInt tappedCardIndex = 1.obs;
 
   RxBool isReviewsTabSelected = true.obs;
   RxBool isPhotosTabSelected = false.obs;
@@ -50,12 +48,12 @@ class PlacesPageViewController extends GetxController {
 
   Size get screenSize => _homeController.size;
 
-  void toggleReviewsTab() {
+  void selectReviewsTab() {
     isReviewsTabSelected.value = true;
     isPhotosTabSelected.value = false;
   }
 
-  void togglePhotosTab() {
+  void selectPhotosTab() {
     isReviewsTabSelected.value = false;
     isPhotosTabSelected.value = true;
   }
@@ -64,8 +62,8 @@ class PlacesPageViewController extends GetxController {
     if (pageController.page!.toInt() != prevPage.value) {
       prevPage.value = pageController.page!.toInt();
       cardTapped.value = false;
-      // photoGalleryIndex.value = 1;
-      // showBlankCard.value = false;
+      photoGalleryIndex.value = 0;
+      showBlankCard.value = false;
       _goToTappedPlace();
     }
   }
@@ -103,12 +101,17 @@ class PlacesPageViewController extends GetxController {
       if (tappedPlace.value!.formattedPhoneNumber.isEmpty &&
           tappedPlace.value!.formattedAddress.isEmpty) {
         try {
-          // fetching place address and contact number by place_id
+          // fetching more details of place like address and contact number by place_id
           var placeDetails = await _placeAutocompleteRepo.getPlaceById(
             getNearbyPlaceByIndex(index).placeId,
             Constants.PLACE_MORE_DETAIL_FIELDS,
           );
 
+          // getting reviews and photos of place
+          List<Review> reviews = _getReviews(placeDetails);
+          List<PlacePhoto> photos = _getPhotos(placeDetails);
+
+          // reinitializing tapped-place with addiotional details
           tappedPlace.value = NearbyPlace(
             placeId: tappedPlace.value!.placeId,
             position: tappedPlace.value!.position,
@@ -120,6 +123,14 @@ class PlacesPageViewController extends GetxController {
                 placeDetails['formatted_phone_number'] ?? 'None Given',
             photoReference: tappedPlace.value!.photoReference,
             rating: tappedPlace.value!.rating,
+            reviews: reviews,
+            photos: photos,
+          );
+
+          // updating nearby-places-list
+          _nearbyPlacesController.updatePlaceListItem(
+            index,
+            tappedPlace.value!,
           );
         } catch (exception) {
           Utils.showErrorSnackBar(exception.toString());
@@ -127,6 +138,35 @@ class PlacesPageViewController extends GetxController {
       }
       _moveCameraSlightly();
     }
+  }
+
+  List<PlacePhoto> _getPhotos(Map<String, dynamic> placeDetails) {
+    List<PlacePhoto> photos = <PlacePhoto>[];
+    placeDetails['photos'].forEach((placePhoto) {
+      photos.add(
+        PlacePhoto(
+          width: placePhoto['width'],
+          height: placePhoto['height'],
+          photoReference: placePhoto['photo_reference'],
+        ),
+      );
+    });
+    return photos;
+  }
+
+  List<Review> _getReviews(Map<String, dynamic> placeDetails) {
+    List<Review> reviews = <Review>[];
+    placeDetails['reviews'].forEach((review) {
+      reviews.add(
+        Review(
+          profilePhotoUrl: review['profile_photo_url'] ?? '',
+          authorName: review['author_name'] ?? 'No Name',
+          rating: review['rating'] ?? 0,
+          text: review['text'] ?? '',
+        ),
+      );
+    });
+    return reviews;
   }
 
   Future<void> _moveCameraSlightly() async {

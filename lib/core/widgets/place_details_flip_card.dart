@@ -1,6 +1,7 @@
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nearby_places_flutter/core/models/models.dart';
 import 'package:nearby_places_flutter/core/widgets/widgets.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/places_page_view_controller.dart';
 
@@ -86,17 +87,37 @@ class PlaceDetailsFlipCard extends StatelessWidget {
                     FlipCardBackTab(
                       controller: controller,
                       label: 'Reviews',
-                      onPressed: () => controller.toggleReviewsTab(),
+                      onPressed: () => controller.selectReviewsTab(),
                       isReviewTab: true,
                     ),
                     FlipCardBackTab(
                       controller: controller,
                       label: 'Photos',
-                      onPressed: () => controller.togglePhotosTab(),
+                      onPressed: () => controller.selectPhotosTab(),
                       isReviewTab: false,
                     ),
                   ],
                 ),
+              ),
+              SizedBox(
+                height: 250,
+                child: Obx(() {
+                  List<Review> reviews = controller.tappedPlace.value!.reviews;
+                  return controller.isReviewsTabSelected.value
+                      ? ListView(
+                          children: [
+                            if (reviews.isNotEmpty)
+                              ...reviews
+                                  .map((review) => ReviewWidget(review: review))
+                          ],
+                        )
+                      : controller.isPhotosTabSelected.value
+                          ? PlacePhotosGallery(
+                              controller: controller,
+                              photos: controller.tappedPlace.value!.photos,
+                            )
+                          : const SizedBox.shrink();
+                }),
               ),
             ],
           ),

@@ -10,3 +10,5 @@ export 'places_cards_horizontal_list.dart';
 export 'place_ratings.dart';
 export 'place_details_flip_card.dart';
 export 'flip_card_back_tab.dart';
+export 'review_widget.dart';
+export 'place_photos_gallery.dart';

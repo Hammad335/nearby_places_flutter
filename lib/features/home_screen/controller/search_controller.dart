@@ -3,10 +3,12 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/home_controller.dart';
 import 'package:nearby_places_flutter/features/home_screen/controller/nearby_places_controller.dart';
+import 'package:nearby_places_flutter/features/home_screen/controller/places_page_view_controller.dart';
 
 class SearchController extends GetxController {
   late HomeController _homeController;
   late NearbyPlacesController _nearbyPlacesController;
+  late PlacesPageViewController _placesPageViewController;
 
   late Rx<TextEditingController> originTextController;
   late Rx<TextEditingController> destTextController;
@@ -26,6 +28,7 @@ class SearchController extends GetxController {
     super.onReady();
     _homeController = Get.find<HomeController>();
     _nearbyPlacesController = Get.find<NearbyPlacesController>();
+    _placesPageViewController = Get.find<PlacesPageViewController>();
   }
 
   void toggleGetDirections() {
@@ -55,6 +58,7 @@ class SearchController extends GetxController {
   _toggle() {
     showResult.value = false;
     _nearbyPlacesController.radiusSlider.value = false;
+    _placesPageViewController.cardTapped.value = false;
     pressedNear.value = false;
     _homeController.initMarkers();
     _nearbyPlacesController.circles.clear();

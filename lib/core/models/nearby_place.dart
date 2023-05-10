@@ -1,4 +1,5 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:nearby_places_flutter/core/models/models.dart';
 
 class NearbyPlace {
   String placeId;
@@ -10,6 +11,8 @@ class NearbyPlace {
   String formattedPhoneNumber;
   String photoReference;
   double rating;
+  List<Review> reviews;
+  List<PlacePhoto> photos;
 
   NearbyPlace({
     required this.placeId,
@@ -21,6 +24,8 @@ class NearbyPlace {
     required this.formattedPhoneNumber,
     required this.photoReference,
     required this.rating,
+    required this.reviews,
+    required this.photos,
   });
 
   Map<String, dynamic> toJson() {
@@ -34,6 +39,8 @@ class NearbyPlace {
       'formattedPhoneNumber': formattedPhoneNumber,
       'photoReference': photoReference,
       'rating': rating,
+      'reviews': reviews,
+      'photos': photos,
     };
   }
 
@@ -48,12 +55,8 @@ class NearbyPlace {
       formattedPhoneNumber: map['formattedPhoneNumber'] as String,
       photoReference: map['photoReference'] as String,
       rating: map['rating'] as double,
+      reviews: map['reviews'].cast<Review>(),
+      photos: map['photos'].cast<PlacePhoto>(),
     );
   }
-
-  set setFormattedAdress(String formattedAddress) =>
-      this.formattedAddress = formattedAddress;
-
-  set setformattedPhoneNumber(String formattedPhoneNumber) =>
-      this.formattedPhoneNumber = formattedPhoneNumber;
 }

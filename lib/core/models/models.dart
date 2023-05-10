@@ -5,3 +5,5 @@ export 'structured_formatting.dart';
 export 'secondary_text_matched_substrings.dart';
 export 'main_text_matched_substrings.dart';
 export 'nearby_place.dart';
+export 'review.dart';
+export 'place_photo.dart';
